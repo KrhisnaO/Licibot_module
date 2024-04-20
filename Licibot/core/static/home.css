@@ -1,0 +1,34 @@
+/* Archivo home.css en static/css/ */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa; /* Color de fondo */
+}
+
+.navbar-brand {
+    color: #007bff; /* Color de enlace azul */
+    font-weight: bold;
+}
+
+.navbar-nav .nav-link {
+    color: #007bff; /* Color de enlace azul */
+}
+
+.info-box {
+    background-color: #ffffff; /* Fondo blanco */
+    border: 1px solid #ced4da; /* Borde gris */
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 5px;
+}
+
+.info-box h2 {
+    color: #007bff; /* Color de título azul */
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.info-box p {
+    color: #495057; /* Color de texto gris oscuro */
+    line-height: 1.6;
+}
