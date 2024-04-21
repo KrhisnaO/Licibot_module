@@ -6,29 +6,29 @@ body {
 }
 
 .navbar-brand {
-    color: #007bff; /* Color de enlace azul */
+    color: #007bff; /* Color de enlace */
     font-weight: bold;
 }
 
 .navbar-nav .nav-link {
-    color: #007bff; /* Color de enlace azul */
+    color: #007bff; /* Color de enlace */
 }
 
 .info-box {
-    background-color: #ffffff; /* Fondo blanco */
-    border: 1px solid #ced4da; /* Borde gris */
+    background-color: #ffffff; 
+    border: 3px solid #ced4da; 
     padding: 20px;
     margin-top: 20px;
-    border-radius: 5px;
+    border-radius: 10px;
 }
 
 .info-box h2 {
-    color: #007bff; /* Color de título azul */
+    color: #1500ff; /* Color de título */
     font-weight: bold;
     margin-bottom: 20px;
 }
 
 .info-box p {
-    color: #495057; /* Color de texto gris oscuro */
+    color: #495057; /* Color de texto  */
     line-height: 1.6;
 }
