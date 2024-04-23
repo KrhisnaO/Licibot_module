@@ -8,3 +8,11 @@ class Licitacion(models.Model):
 
     def __str__(self):
         return self.nombreLicitacion
+
+class Preguntasbbdd(models.Model):
+    idPreguntas = models.IntegerField(primary_key=True, verbose_name="Id de pregunta")
+    nombrePregunta = models.CharField(max_length=80, blank=False, null=False, verbose_name="Texto de la pregunta")
+
+
+    def __str__(self):
+        return self.nombrePregunta
