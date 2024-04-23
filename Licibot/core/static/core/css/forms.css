@@ -1,0 +1,41 @@
+/* Estilos para el formulario de inicio de sesión */
+
+/* Estilos para el formulario en general */
+#formulario {
+    margin-top: 20px;
+}
+
+/* Estilos para el botón de ingresar */
+#formulario input[type="submit"] {
+    width: 100%;
+}
+
+/* Estilos para los mensajes de error */
+#form_message {
+    margin-top: 10px;
+}
+
+/* Estilos para el contenedor del formulario */
+.card {
+    margin-top: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para el header del formulario */
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Estilos para el título del formulario */
+.card-header h3 {
+    margin-bottom: 0;
+}
+
+/* Estilos para el formulario en dispositivos pequeños */
+@media (max-width: 576px) {
+    .card {
+        margin-top: 10px;
+    }
+}

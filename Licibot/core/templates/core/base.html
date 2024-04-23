@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Licibot</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'core/css/home.css' %}">
+    {% block stylesheet %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="{% url 'home' %}">Licibot</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    
+        <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+            <ul class="navbar-nav">
+                {% if not user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'ingreso' %}" style="font-size: 1.2em;">Iniciar sesión</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <span class="nav-link disabled" style="font-size: 1.2em;">Hola, {{ user.username }}</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cerrar_sesion' %}" style="font-size: 1.2em;">Cerrar sesión</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Contenido de la página -->
+    <div class="container mt-5">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Bootstrap JS y otros scripts si los tienes -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <!-- Tu script personalizado -->
+    {% block custom_script %}
+    <script>
+        $(document).ready(function(){
+            set_nav_li("#inicio", "{% url 'home' %}");
+            set_nav_li("#inises", "{% url 'ingreso' %}");
+            set_nav_li("#cerses", "{% url 'cerrar_sesion' %}");
+
+            function set_nav_li(id, url) {
+                $(id).addClass('nav-item list-inline-item align-center nav_item_text');
+                name = $(id).html();
+                $(id).html('');
+                $(id).append(`<a href="${url}" style="font-size: 1.2em;">${name}</a>`)
+            }
+        });
+    </script>
+    {% endblock %}
+</body>
+</html>
