@@ -7,6 +7,9 @@ from .forms import LoginForm
 def home (request):
     return render(request, 'core/home.html')
 
+def liccreac (request):
+    return render(request, 'core/creacion_de_licitaciones.html')
+
 
 # INGRESO DE SESION #def login_view(request):
 def login_view(request):
