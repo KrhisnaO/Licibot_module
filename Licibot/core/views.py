@@ -4,8 +4,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from .models import CustomUser 
-from .forms import LoginForm, CreateUserForm
-
+from .forms import LoginForm, CreateUserForm, LicitacionForm
+import requests
 # Create your views here.
 
 def home (request):
@@ -14,6 +14,33 @@ def home (request):
 @login_required
 def liccreac (request):
     return render(request, 'core/creacion_de_licitaciones.html')
+
+def create_licitacion(request):
+    if request.method == 'POST':
+        form = LicitacionForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Extraemos los datos necesarios para la verificación
+            id_licitacion = form.cleaned_data['idLicitacion']
+            nombre_licitacion = form.cleaned_data['nombreLicitacion']
+
+            # Verificamos si existe alguna licitación con el mismo ID o nombre
+            if create_licitacion.objects.filter(idLicitacion=id_licitacion).exists():
+                messages.error(request, f'Una licitación con el ID {id_licitacion} ya existe.')
+                return render(request, 'core/creacion_de_licitaciones.html', {'form': form})
+
+            if create_licitacion.objects.filter(nombreLicitacion=nombre_licitacion).exists():
+                messages.error(request, f'Una licitación con el nombre "{nombre_licitacion}" ya existe.')
+                return render(request, 'core/creacion_de_licitaciones.html', {'form': form})
+
+            # Si no existe, guardamos la nueva licitación
+            form.save()
+            messages.success(request, 'Licitación creada exitosamente.')
+            return redirect('nombre-url-lista-licitaciones')  # Asegúrate de usar el nombre correcto de la URL
+
+    else:
+        form = LicitacionForm()
+
+    return render(request, 'core/creacion_de_licitaciones.html', {'form': form})
 
 # INGRESO DE SESION :
 def login_view(request):

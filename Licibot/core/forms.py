@@ -7,14 +7,27 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput(), label="Contraseña")
 
 class LicitacionForm(forms.ModelForm):
-    idLicitacion = forms.IntegerField(
-        widget=forms.NumberInput(attrs={'min': 0, 'max': 100})),
-    label="Idlicit"
-    nombreLicitacion = forms.CharField(widget=forms.TextInput(), label="Nombre lic")
     class Meta:
         model = Licitacion
-        fields = ['idLicitacion', 'nombreLicitacion']
-
+        fields = ['idLicitacion', 'nombreLicitacion', 'archivoLicitacion']
+        widgets = {
+            'idLicitacion': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ingrese el ID de la licitación'
+            }),
+            'nombreLicitacion': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ingrese el nombre de la licitación'
+            }),
+            'archivoLicitacion': forms.FileInput(attrs={
+                'class': 'form-control-file'
+            })
+        }
+        labels = {
+            'idLicitacion': 'ID de la Licitación',
+            'nombreLicitacion': 'Nombre de la Licitación',
+            'archivoLicitacion': 'Subir Archivo (obligatorio)'
+        }
 
 class CreateUserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
