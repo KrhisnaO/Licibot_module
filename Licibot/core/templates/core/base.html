@@ -20,23 +20,27 @@
     
         <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
             <ul class="navbar-nav">
-                {% if not user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'ingreso' %}" style="font-size: 1.2em;">Iniciar sesión</a>
-                    </li>
-                {% else %}
+                {% if user.is_authenticated %}
+                    <!-- Opción de Administración solo si el usuario ha iniciado sesión -->
+                    {% if request.path == '/' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'administrador' %}" style="font-size: 1.2em;">Administración</a>
+                        </li>
+                    {% endif %}
                     <li class="nav-item">
                         <span class="nav-link disabled" style="font-size: 1.2em;">Hola, {{ user.username }}</span>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'cerrar_sesion' %}" style="font-size: 1.2em;">Cerrar sesión</a>
                     </li>
+                {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'crear_licitaciones' %}" style="font-size: 1.2em;">Crear licitaciones</a>
+                        <a class="nav-link" href="{% url 'ingreso' %}" style="font-size: 1.2em;">Iniciar sesión</a>
                     </li>
                 {% endif %}
             </ul>
         </div>
+
     </nav>
 
     <!-- Contenido de la página -->
@@ -45,12 +49,12 @@
         {% endblock %}
     </div>
 
-    <!-- Bootstrap JS y otros scripts si los tienes -->
+    <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
-    <!-- Tu script personalizado -->
+    <!-- Script  -->
     {% block custom_script %}
     <script>
         $(document).ready(function(){

@@ -1,0 +1,21 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<h2 class="text-center">Menú Administración</h2>
+<br>
+<br>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="list-group">
+                    <a href="{% url 'crear_usuario' %}" class="list-group-item list-group-item-action">Crear Usuario</a>
+                    <a href="{% url 'historial_usu' %}" class="list-group-item list-group-item-action">Historial de Usuarios</a>
+                    
+                </div>
+            </div>
+            <div class="col-md-9">
+                {% block admin_content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
