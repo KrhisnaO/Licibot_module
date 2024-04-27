@@ -1,20 +1,16 @@
-
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import CustomUser 
 from .forms import LoginForm, CreateUserForm, LicitacionForm
-import requests
+
 # Create your views here.
 
 def home (request):
     return render(request, 'core/home.html')
 
 @login_required
-def liccreac (request):
-    return render(request, 'core/creacion_de_licitaciones.html')
-
 def create_licitacion(request):
     if request.method == 'POST':
         form = LicitacionForm(request.POST, request.FILES)
@@ -35,7 +31,7 @@ def create_licitacion(request):
             # Si no existe, guardamos la nueva licitación
             form.save()
             messages.success(request, 'Licitación creada exitosamente.')
-            return redirect('crear_licitaciones.html')  # Asegúrate de usar el nombre correcto de la URL
+            return redirect('creacion_de_licitaciones.html')  # Asegúrate de usar el nombre correcto de la URL
 
     else:
         form = LicitacionForm()
