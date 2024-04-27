@@ -1,8 +1,8 @@
+
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import Group
 from .models import CustomUser 
 from .forms import LoginForm, CreateUserForm
 
@@ -26,7 +26,7 @@ def login_view(request):
             if user is not None and user.is_active:
                 login(request, user)
                 if user.is_superuser:
-                    return redirect('administrador')
+                    return redirect('crear_usuario')
                 elif user.groups.filter(name='VENDEDOR').exists():
                     return redirect('vendedor')
                 elif user.groups.filter(name='GERENTE').exists():
@@ -98,3 +98,13 @@ def vendedor(request):
 @login_required
 def gerente(request):
     return render(request, 'core/gerente.html')
+
+# PREGUNTAS #
+
+
+# SUBIR ARCHIVO PDF #
+
+
+###################################################################
+# SUBIR ARCHIVO PDF #
+

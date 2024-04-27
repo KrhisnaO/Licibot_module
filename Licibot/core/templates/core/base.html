@@ -24,7 +24,7 @@
                     <!-- Opción de Administración solo si el usuario ha iniciado sesión -->
                     {% if request.path == '/' %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'administrador' %}" style="font-size: 1.2em;">Administración</a>
+                            <a class="nav-link" href="{% url 'crear_usuario' %}" style="font-size: 1.2em;">Administración</a>
                         </li>
                     {% endif %}
                     <li class="nav-item">
