@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import create_licitacion
 
 
 urlpatterns = [
@@ -12,6 +13,5 @@ urlpatterns = [
     path('historial_usu/', views.historial_usu, name='historial_usu'),
     path('vendedor/', views.vendedor, name='vendedor'),
     path('gerente/', views.gerente, name='gerente'),
-
 ]
 

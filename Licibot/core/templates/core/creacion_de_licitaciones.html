@@ -7,17 +7,56 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="info-box">
-                <h2 class="text-center">Información de Licibot</h2>
-                <p>Licibot es una plataforma diseñada para simplificar la gestión de licitaciones públicas y privadas. Con Licibot, puedes:</p>
-                <ul>
-                    <li>Roberto estuvo aqui</li>
-                    
-                </ul>
+    <h1>Crear Nueva Licitación</h1>
+
+    <!-- Mostrar mensajes de error o éxito -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
             </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Formulario para crear licitación -->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Campo para ID de Licitación -->
+        <div class="form-group">
+            <label for="{{ form.idLicitacion.id_for_label }}">{{ form.idLicitacion.label }}</label>
+            {{ form.idLicitacion }}
+            {% if form.idLicitacion.errors %}
+                {% for error in form.idLicitacion.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
         </div>
-    </div>
+
+        <!-- Campo para Nombre de Licitación -->
+        <div class="form-group">
+            <label for="{{ form.nombreLicitacion.id_for_label }}">{{ form.nombreLicitacion.label }}</label>
+            {{ form.nombreLicitacion }}
+            {% if form.nombreLicitacion.errors %}
+                {% for error in form.nombreLicitacion.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Campo para Subir Archivo -->
+        <div class="form-group">
+            <label for="{{ form.archivoLicitacion.id_for_label }}">{{ form.archivoLicitacion.label }}</label>
+            {{ form.archivoLicitacion }}
+            {% if form.archivoLicitacion.errors %}
+                {% for error in form.archivoLicitacion.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Botón de Envío -->
+        <button type="submit" class="btn btn-primary">Guardar Licitación</button>
+    </form>
 </div>
 {% endblock %}
