@@ -35,7 +35,7 @@ def create_licitacion(request):
             # Si no existe, guardamos la nueva licitación
             form.save()
             messages.success(request, 'Licitación creada exitosamente.')
-            return redirect('nombre-url-lista-licitaciones')  # Asegúrate de usar el nombre correcto de la URL
+            return redirect('crear_licitaciones.html')  # Asegúrate de usar el nombre correcto de la URL
 
     else:
         form = LicitacionForm()

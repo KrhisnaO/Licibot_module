@@ -6,24 +6,57 @@
 {% endblock %}
 
 {% block content %}
-<div class="col-md-6">
-    <h3>Crear Licitacion</h3>
-    <div class="card-body">
-        {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                    <li class="{{ message.tags }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-        <form method="POST" action="" enctype="multipart/form-data" id="create_licitacion">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <div class="text-center mt-3">
-                <input type="submit" class="btn btn-primary" value="Crear Licitacion">
-            </div>
-        </form>
-    </div>
-</div>
+<div class="container mt-5">
+    <h1>Crear Nueva Licitación</h1>
 
+    <!-- Mostrar mensajes de error o éxito -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Formulario para crear licitación -->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Campo para ID de Licitación -->
+        <div class="form-group">
+            <label for="{{ form.idLicitacion.id_for_label }}">{{ form.idLicitacion.label }}</label>
+            {{ form.idLicitacion }}
+            {% if form.idLicitacion.errors %}
+                {% for error in form.idLicitacion.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Campo para Nombre de Licitación -->
+        <div class="form-group">
+            <label for="{{ form.nombreLicitacion.id_for_label }}">{{ form.nombreLicitacion.label }}</label>
+            {{ form.nombreLicitacion }}
+            {% if form.nombreLicitacion.errors %}
+                {% for error in form.nombreLicitacion.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Campo para Subir Archivo -->
+        <div class="form-group">
+            <label for="{{ form.archivoLicitacion.id_for_label }}">{{ form.archivoLicitacion.label }}</label>
+            {{ form.archivoLicitacion }}
+            {% if form.archivoLicitacion.errors %}
+                {% for error in form.archivoLicitacion.errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Botón de Envío -->
+        <button type="submit" class="btn btn-primary">Guardar Licitación</button>
+    </form>
+</div>
 {% endblock %}
