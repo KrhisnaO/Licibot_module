@@ -1,6 +1,19 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-<h2>Vendedor</h2>
-<!-- Contenido específico para la página de vendedor -->
+<h2 class="text-center">Menú Vendedor</h2>
+<br>
+<br>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="list-group">
+                    <a href="{% url 'creacion_de_licitaciones' %}" class="list-group-item list-group-item-action">Crear Licitaciones</a>
+                    
+                </div>
+            </div>
+            <div class="col-md-9">
+            </div>
+        </div>
+    </div>
 {% endblock %}

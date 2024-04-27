@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import CustomUser 
+from .models import CustomUser, Licitacion
 from .forms import LoginForm, CreateUserForm, LicitacionForm
 
 # Create your views here.
@@ -18,24 +18,19 @@ def create_licitacion(request):
             # Extraemos los datos necesarios para la verificación
             id_licitacion = form.cleaned_data['idLicitacion']
             nombre_licitacion = form.cleaned_data['nombreLicitacion']
-
             # Verificamos si existe alguna licitación con el mismo ID o nombre
-            if create_licitacion.objects.filter(idLicitacion=id_licitacion).exists():
+            if Licitacion.objects.filter(idLicitacion=id_licitacion).exists():
                 messages.error(request, f'Una licitación con el ID {id_licitacion} ya existe.')
-                return render(request, 'core/creacion_de_licitaciones.html', {'form': form})
-
-            if create_licitacion.objects.filter(nombreLicitacion=nombre_licitacion).exists():
+                return render(request, 'creacion_de_licitaciones', {'form': form})
+            if Licitacion.objects.filter(nombreLicitacion=nombre_licitacion).exists():
                 messages.error(request, f'Una licitación con el nombre "{nombre_licitacion}" ya existe.')
-                return render(request, 'core/creacion_de_licitaciones.html', {'form': form})
-
+                return render(request, 'creacion_de_licitaciones', {'form': form})
             # Si no existe, guardamos la nueva licitación
             form.save()
             messages.success(request, 'Licitación creada exitosamente.')
-            return redirect('creacion_de_licitaciones.html')  # Asegúrate de usar el nombre correcto de la URL
-
+            return redirect('creacion_de_licitaciones')
     else:
         form = LicitacionForm()
-
     return render(request, 'core/creacion_de_licitaciones.html', {'form': form})
 
 # INGRESO DE SESION :
