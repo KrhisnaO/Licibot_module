@@ -1,5 +1,5 @@
 from django import forms
-from .models import Licitacion, CustomUser
+from .models import Licitacion, CustomUser, Preguntasbbdd
 from django.contrib.auth.models import Group
 
 class LoginForm(forms.Form):
@@ -11,6 +11,10 @@ class LicitacionForm(forms.ModelForm):
         model = Licitacion
         fields = ['idLicitacion', 'nombreLicitacion', 'archivoLicitacion']
 
+class PreguntasForm(forms.ModelForm):
+    class Meta:
+        model = Preguntasbbdd
+        fields = ['idPreguntas', 'nombrePregunta']
 
 class CreateUserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())

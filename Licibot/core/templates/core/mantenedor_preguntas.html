@@ -8,7 +8,7 @@
 {% block content %}
 <div class="container">
     <h1 style="text-align: center !important;">
-        Mantenedor de Licitaciones
+        Mantenedor de Preguntas
     </h1>
     {% if form %}
     <form method="POST" action="" enctype="multipart/form-data" id="formulario">
@@ -17,9 +17,9 @@
         </div>
         <input type="submit" class="btn btn-primary btnwidth" id="id_guardar" value="Guardar">
         <!-- <input type="reset" class="btn btn-primary btnwidth" id="id_nuevo" value="Nuevo"> -->
-        <a class="btn btn-success btnwidth" href="{% url 'creacion_de_licitaciones' 'ins' -1 %}">Nuevo</a>
+        <a class="btn btn-success btnwidth" href="{% url 'mantenedor_preguntas' 'ins' -1 %}">Nuevo</a>
         {% if id != '-1' %}
-        <a class="btn btn-danger btnwidth" href="{% url 'creacion_de_licitaciones' 'del' id %}">Eliminar</a>
+        <a class="btn btn-danger btnwidth" href="{% url 'mantenedor_preguntas' 'del' id %}">Eliminar</a>
         {% endif %}
         <a class="btn btn-info btnwidth" href="{% url 'home' %}">Inicio</a>
         {% if mesg %}
@@ -32,31 +32,19 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Nombre</th>
-                <th>Archivo</th>
+                <th>Pregunta</th>
                 <th class="titulo_boton">Editar</th>
                 <th class="titulo_boton">Eliminar</th>
             </tr>
         </thead>
         <tbody>
-            {% for licit in list %}
+            {% for pregunt in list %}
             <tr>
-                <td>{{ licit.idLicitacion }}</td>
-                <td>{{ licit.nombreLicitacion }}</td>
-                <td>
-                    {% if licit.archivoLicitacion %}
-                    <a href="{{ MEDIA_URL }}{{ licit.archivoLicitacion }}" target="_blank" title="Ver PDF">
-                        <i class="fas fa-file-pdf">
-                            {{ licit.archivoLicitacion }}
-                        </i> 
-                    </a>
-                    {% else %}
-                    sin archivo
-                    {% endif %}
-                </td>
-                <td><a href="{% url 'creacion_de_licitaciones' 'upd' licit.idLicitacion %}" 
+                <td>{{ pregunt.idPreguntas }}</td>
+                <td>{{ pregunt.nombrePregunta }}</td>
+                <td><a href="{% url 'mantenedor_preguntas' 'upd' pregunt.idPreguntas %}" 
                     class="btn btn-primary btn-sm boton_chico">Editar</a></td>
-                <td><a href="{% url 'creacion_de_licitaciones' 'del' licit.idLicitacion %}" 
+                <td><a href="{% url 'mantenedor_preguntas' 'del' pregunt.idPreguntas %}" 
                     class="btn btn-danger btn-sm boton_chico">Eliminar</a></td>
             </tr>
             {% endfor %}

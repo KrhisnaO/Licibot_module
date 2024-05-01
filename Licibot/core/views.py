@@ -2,8 +2,8 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import CustomUser, Licitacion
-from .forms import LoginForm, CreateUserForm, LicitacionForm
+from .models import CustomUser, Licitacion, Preguntasbbdd
+from .forms import LoginForm, CreateUserForm, LicitacionForm, PreguntasForm
 
 # Create your views here.
 
@@ -44,6 +44,38 @@ def create_licitacion(request, action, id):
     data["list"] = Licitacion.objects.all().order_by('idLicitacion')
     return render(request, "core/creacion_de_licitaciones.html", data)
 
+def mantenedor_preguntas(request, action, id):
+    data = {"mesg": "", "form": PreguntasForm, "action": action, "id": id}
+
+    if action == 'ins':
+        if request.method == "POST":
+            form = PreguntasForm(request.POST, request.FILES)
+            if form.is_valid:
+                try:
+                    form.save()
+                    data["mesg"] = "¡La Pregunta fue creada correctamente!"
+                except:
+                    data["mesg"] = "¡No se puede crear dos Preguntas con la misma id!"
+
+    elif action == 'upd':
+        objeto = Preguntasbbdd.objects.get(idPreguntas=id)
+        if request.method == "POST":
+            form = PreguntasForm(data=request.POST, files=request.FILES, instance=objeto)
+            if form.is_valid:
+                form.save()
+                data["mesg"] = "¡La Pregunta fue actualizada correctamente!"
+        data["form"] = PreguntasForm(instance=objeto)
+
+    elif action == 'del':
+        try:
+            Preguntasbbdd.objects.get(idPreguntas=id).delete()
+            data["mesg"] = "¡La Pregunta fue eliminada correctamente!"
+            return redirect(Preguntasbbdd, action='ins', id = '-1')
+        except:
+            data["mesg"] = "¡La Pregunta ya estaba eliminada!"
+
+    data["list"] = Preguntasbbdd.objects.all().order_by('idPreguntas')
+    return render(request, "core/mantenedor_preguntas.html", data)
 
 # INGRESO DE SESION :
 def login_view(request):
