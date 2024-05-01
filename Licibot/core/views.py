@@ -11,27 +11,39 @@ def home (request):
     return render(request, 'core/home.html')
 
 @login_required
-def create_licitacion(request):
-    if request.method == 'POST':
-        form = LicitacionForm(request.POST, request.FILES)
-        if form.is_valid():
-            # Extraemos los datos necesarios para la verificación
-            id_licitacion = form.cleaned_data['idLicitacion']
-            nombre_licitacion = form.cleaned_data['nombreLicitacion']
-            # Verificamos si existe alguna licitación con el mismo ID o nombre
-            if Licitacion.objects.filter(idLicitacion=id_licitacion).exists():
-                messages.error(request, f'Una licitación con el ID {id_licitacion} ya existe.')
-                return render(request, 'creacion_de_licitaciones', {'form': form})
-            if Licitacion.objects.filter(nombreLicitacion=nombre_licitacion).exists():
-                messages.error(request, f'Una licitación con el nombre "{nombre_licitacion}" ya existe.')
-                return render(request, 'creacion_de_licitaciones', {'form': form})
-            # Si no existe, guardamos la nueva licitación
-            form.save()
-            messages.success(request, 'Licitación creada exitosamente.')
-            return redirect('creacion_de_licitaciones')
-    else:
-        form = LicitacionForm()
-    return render(request, 'core/creacion_de_licitaciones.html', {'form': form})
+def create_licitacion(request, action, id):
+    data = {"mesg": "", "form": LicitacionForm, "action": action, "id": id}
+
+    if action == 'ins':
+        if request.method == "POST":
+            form = LicitacionForm(request.POST, request.FILES)
+            if form.is_valid:
+                try:
+                    form.save()
+                    data["mesg"] = "¡La Licitacion fue creada correctamente!"
+                except:
+                    data["mesg"] = "¡No se puede crear dos licitaciones con la misma id!"
+
+    elif action == 'upd':
+        objeto = Licitacion.objects.get(idLicitacion=id)
+        if request.method == "POST":
+            form = LicitacionForm(data=request.POST, files=request.FILES, instance=objeto)
+            if form.is_valid:
+                form.save()
+                data["mesg"] = "¡La Licitacion fue actualizada correctamente!"
+        data["form"] = LicitacionForm(instance=objeto)
+
+    elif action == 'del':
+        try:
+            Licitacion.objects.get(idLicitacion=id).delete()
+            data["mesg"] = "¡La Licitacion fue eliminada correctamente!"
+            return redirect(Licitacion, action='ins', id = '-1')
+        except:
+            data["mesg"] = "¡La Licitacion ya estaba eliminada!"
+
+    data["list"] = Licitacion.objects.all().order_by('idLicitacion')
+    return render(request, "core/creacion_de_licitaciones.html", data)
+
 
 # INGRESO DE SESION :
 def login_view(request):

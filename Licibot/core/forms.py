@@ -10,24 +10,7 @@ class LicitacionForm(forms.ModelForm):
     class Meta:
         model = Licitacion
         fields = ['idLicitacion', 'nombreLicitacion', 'archivoLicitacion']
-        widgets = {
-            'idLicitacion': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ingrese el ID de la licitación'
-            }),
-            'nombreLicitacion': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ingrese el nombre de la licitación'
-            }),
-            'archivoLicitacion': forms.FileInput(attrs={
-                'class': 'form-control-file'
-            })
-        }
-        labels = {
-            'idLicitacion': 'ID de la Licitación',
-            'nombreLicitacion': 'Nombre de la Licitación',
-            'archivoLicitacion': 'Subir Archivo (obligatorio)'
-        }
+
 
 class CreateUserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())

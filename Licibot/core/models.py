@@ -10,7 +10,6 @@ class Licitacion(models.Model):
 
     def __str__(self):
         return self.nombreLicitacion
-    
 
 # PREGUNTAS LICIBOT #
 class Preguntasbbdd(models.Model):

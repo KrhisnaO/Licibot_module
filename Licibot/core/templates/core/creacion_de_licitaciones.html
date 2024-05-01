@@ -6,57 +6,62 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1>Crear Nueva Licitación</h1>
-
-    <!-- Mostrar mensajes de error o éxito -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
-    <!-- Formulario para crear licitación -->
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        <!-- Campo para ID de Licitación -->
+<div class="container">
+    <h1 style="text-align: center !important;">
+        Mantenedor de Licitaciones
+    </h1>
+    {% if form %}
+    <form method="POST" action="" enctype="multipart/form-data" id="formulario">
         <div class="form-group">
-            <label for="{{ form.idLicitacion.id_for_label }}">{{ form.idLicitacion.label }}</label>
-            {{ form.idLicitacion }}
-            {% if form.idLicitacion.errors %}
-                {% for error in form.idLicitacion.errors %}
-                    <div class="alert alert-danger">{{ error }}</div>
-                {% endfor %}
-            {% endif %}
+            {% csrf_token %} {{ form.as_p }}
         </div>
-
-        <!-- Campo para Nombre de Licitación -->
-        <div class="form-group">
-            <label for="{{ form.nombreLicitacion.id_for_label }}">{{ form.nombreLicitacion.label }}</label>
-            {{ form.nombreLicitacion }}
-            {% if form.nombreLicitacion.errors %}
-                {% for error in form.nombreLicitacion.errors %}
-                    <div class="alert alert-danger">{{ error }}</div>
-                {% endfor %}
-            {% endif %}
-        </div>
-
-        <!-- Campo para Subir Archivo -->
-        <div class="form-group">
-            <label for="{{ form.archivoLicitacion.id_for_label }}">{{ form.archivoLicitacion.label }}</label>
-            {{ form.archivoLicitacion }}
-            {% if form.archivoLicitacion.errors %}
-                {% for error in form.archivoLicitacion.errors %}
-                    <div class="alert alert-danger">{{ error }}</div>
-                {% endfor %}
-            {% endif %}
-        </div>
-
-        <!-- Botón de Envío -->
-        <button type="submit" class="btn btn-primary">Guardar Licitación</button>
+        <input type="submit" class="btn btn-primary btnwidth" id="id_guardar" value="Guardar">
+        <!-- <input type="reset" class="btn btn-primary btnwidth" id="id_nuevo" value="Nuevo"> -->
+        <a class="btn btn-success btnwidth" href="{% url 'creacion_de_licitaciones' 'ins' -1 %}">Nuevo</a>
+        {% if id != '-1' %}
+        <a class="btn btn-danger btnwidth" href="{% url 'creacion_de_licitaciones' 'del' id %}">Eliminar</a>
+        {% endif %}
+        <a class="btn btn-info btnwidth" href="{% url 'home' %}">Inicio</a>
+        {% if mesg %}
+        <div id="form_message" class="alert alert-danger" role="alert">{{ mesg }}</div>
+        {% endif %}
     </form>
+    {% endif %}
+    {% if list %}
+    <table id="tabla_datos">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Archivo</th>
+                <th class="titulo_boton">Editar</th>
+                <th class="titulo_boton">Eliminar</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for licit in list %}
+            <tr>
+                <td>{{ licit.idLicitacion }}</td>
+                <td>{{ licit.nombreLicitacion }}</td>
+                <td>
+                    {% if licit.archivoLicitacion %}
+                    <a href="{{ MEDIA_URL }}{{ licit.archivoLicitacion }}" target="_blank" title="Ver PDF">
+                        <i class="fas fa-file-pdf">
+                            {{ licit.archivoLicitacion }}
+                        </i> 
+                    </a>
+                    {% else %}
+                    sin archivo
+                    {% endif %}
+                </td>
+                <td><a href="{% url 'creacion_de_licitaciones' 'upd' licit.idLicitacion %}" 
+                    class="btn btn-primary btn-sm boton_chico">Editar</a></td>
+                <td><a href="{% url 'creacion_de_licitaciones' 'del' licit.idLicitacion %}" 
+                    class="btn btn-danger btn-sm boton_chico">Eliminar</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
 </div>
 {% endblock %}
