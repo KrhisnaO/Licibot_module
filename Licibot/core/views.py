@@ -4,10 +4,30 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import CustomUser, Licitacion, Preguntasbbdd
 from .forms import LoginForm, CreateUserForm, LicitacionForm, PreguntasForm
+import requests
 
 # Create your views here.
 
+## SE UTILIZA HOME PARA QUE LA API CORRA UNA VEZ INICIADA LA PAGINA WEB ##
+
 def home (request):
+
+    # Reemplaza 'https://ejemplo.com/api/datos' con la URL real de la API
+    url_api = "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json?ticket=F8537A18-6766-4DEF-9E59-426B4FEE2844"
+
+    # Envía una solicitud GET a la URL de la API
+    respuesta = requests.get(url_api)
+
+    # Verifica si la solicitud fue exitosa
+    if respuesta.status_code == 200:
+    # Convierte la respuesta en un objeto JSON
+        datos = respuesta.json()
+        listado = datos['Listado']
+
+        for licitacion in listado:
+            if 'oFicinA'.upper() in licitacion['Nombre'].upper():
+                print(licitacion)
+                print()
     return render(request, 'core/home.html')
 
 @login_required

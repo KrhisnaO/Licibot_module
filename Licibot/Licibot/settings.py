@@ -14,6 +14,8 @@ from pathlib import Path
 import os
 from os import path
 
+from .db import MYSQL
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -73,16 +75,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Licibot.wsgi.application'
 
 
-# Database
+# Database with MSQL
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
+DATABASES = MYSQL
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
