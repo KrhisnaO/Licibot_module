@@ -38,7 +38,7 @@ pip install -r requirements.txt
 ### 5. Ejecutar el Proyecto
 
 ```bash
-python3 mangage.py runserver
+python3 manage.py runserver
 ```
 
 
