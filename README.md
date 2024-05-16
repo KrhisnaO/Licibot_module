@@ -38,10 +38,6 @@ pip install -r requirements.txt
 ### 5. Ejecutar el Proyecto
 
 ```bash
-python3 manage.py runserver
+python manage.py runserver
 ```
 
-
-## Licencia
-
-Este proyecto está licenciado bajo la [Licencia MIT](LICENSE).
