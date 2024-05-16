@@ -16,12 +16,10 @@
             {% csrf_token %} {{ form.as_p }}
         </div>
         <input type="submit" class="btn btn-primary btnwidth" id="id_guardar" value="Guardar">
-        <!-- <input type="reset" class="btn btn-primary btnwidth" id="id_nuevo" value="Nuevo"> -->
         <a class="btn btn-success btnwidth" href="{% url 'creacion_de_licitaciones' 'ins' -1 %}">Nuevo</a>
         {% if id != '-1' %}
         <a class="btn btn-danger btnwidth" href="{% url 'creacion_de_licitaciones' 'del' id %}">Eliminar</a>
         {% endif %}
-        <a class="btn btn-info btnwidth" href="{% url 'home' %}">Inicio</a>
         {% if mesg %}
         <div id="form_message" class="alert alert-danger" role="alert">{{ mesg }}</div>
         {% endif %}

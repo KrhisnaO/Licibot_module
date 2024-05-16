@@ -6,14 +6,14 @@ from django.contrib.auth.models import AbstractUser
 class Licitacion(models.Model):
     idLicitacion = models.IntegerField(primary_key=True, verbose_name="Id de licitación")
     nombreLicitacion = models.CharField(max_length=80, blank=False, null=False, verbose_name="Nombre de la licitación")
-    archivoLicitacion = models.FileField(upload_to="media/", null=True, blank=True)
+    archivoLicitacion = models.FileField(upload_to="media/", null=True, blank=True,  verbose_name="Archivo de la licitación")
 
     def __str__(self):
         return self.nombreLicitacion
 
 # PREGUNTAS LICIBOT #
 class Preguntasbbdd(models.Model):
-    idPreguntas = models.IntegerField(primary_key=True, verbose_name="Id de pregunta")
+    idPreguntas = models.AutoField(primary_key=True, verbose_name="Id de pregunta")
     nombrePregunta = models.CharField(max_length=80, blank=False, null=False, verbose_name="Texto de la pregunta")
 
     def __str__(self):

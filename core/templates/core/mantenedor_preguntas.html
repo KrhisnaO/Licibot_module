@@ -10,18 +10,19 @@
     <h1 style="text-align: center !important;">
         Mantenedor de Preguntas
     </h1>
+    <br>
     {% if form %}
     <form method="POST" action="" enctype="multipart/form-data" id="formulario">
+        <br>
         <div class="form-group">
             {% csrf_token %} {{ form.as_p }}
         </div>
+
         <input type="submit" class="btn btn-primary btnwidth" id="id_guardar" value="Guardar">
-        <!-- <input type="reset" class="btn btn-primary btnwidth" id="id_nuevo" value="Nuevo"> -->
         <a class="btn btn-success btnwidth" href="{% url 'mantenedor_preguntas' 'ins' -1 %}">Nuevo</a>
         {% if id != '-1' %}
         <a class="btn btn-danger btnwidth" href="{% url 'mantenedor_preguntas' 'del' id %}">Eliminar</a>
         {% endif %}
-        <a class="btn btn-info btnwidth" href="{% url 'home' %}">Inicio</a>
         {% if mesg %}
         <div id="form_message" class="alert alert-danger" role="alert">{{ mesg }}</div>
         {% endif %}
@@ -34,7 +35,6 @@
                 <th>Id</th>
                 <th>Pregunta</th>
                 <th class="titulo_boton">Editar</th>
-                <th class="titulo_boton">Eliminar</th>
             </tr>
         </thead>
         <tbody>
@@ -44,8 +44,6 @@
                 <td>{{ pregunt.nombrePregunta }}</td>
                 <td><a href="{% url 'mantenedor_preguntas' 'upd' pregunt.idPreguntas %}" 
                     class="btn btn-primary btn-sm boton_chico">Editar</a></td>
-                <td><a href="{% url 'mantenedor_preguntas' 'del' pregunt.idPreguntas %}" 
-                    class="btn btn-danger btn-sm boton_chico">Eliminar</a></td>
             </tr>
             {% endfor %}
         </tbody>

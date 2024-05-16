@@ -10,26 +10,30 @@ import requests
 
 ## SE UTILIZA HOME PARA QUE LA API CORRA UNA VEZ INICIADA LA PAGINA WEB ##
 
-def home (request):
-
-    # Reemplaza 'https://ejemplo.com/api/datos' con la URL real de la API
-    url_api = "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json?ticket=F8537A18-6766-4DEF-9E59-426B4FEE2844"
+def home(request):
+    # CONSULTA POR LICITACIONES ACTIVAS
+    url_api = "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json?estado=activas&ticket=F8537A18-6766-4DEF-9E59-426B4FEE2844"
 
     # Envía una solicitud GET a la URL de la API
     respuesta = requests.get(url_api)
 
     # Verifica si la solicitud fue exitosa
     if respuesta.status_code == 200:
-    # Convierte la respuesta en un objeto JSON
+        # Convierte la respuesta en un objeto JSON
         datos = respuesta.json()
-        listado = datos['Listado']
+        listado = datos.get('Listado', [])
 
-        for licitacion in listado:
-            if 'oFicinA'.upper() in licitacion['Nombre'].upper():
-                print(licitacion)
-                print()
-    return render(request, 'core/home.html')
+        # Filtra las licitaciones que contienen 'oFicinA' en el nombre
+        licitaciones_filtradas = [licitacion for licitacion in listado if 'oFicinA'.upper() in licitacion.get('Nombre', '').upper()]
 
+        # Renderiza el template con el listado de licitaciones filtradas como contexto
+        return render(request, 'core/home.html', {'licitaciones': licitaciones_filtradas})
+    else:
+        # Si la solicitud no fue exitosa, devuelve un mensaje de error
+        return render(request, 'core/home.html', {'error_message': 'No se pudieron obtener las licitaciones'})
+
+
+#### SUBIR ARCHIVO PDF #########################################################
 @login_required
 def create_licitacion(request, action, id):
     data = {"mesg": "", "form": LicitacionForm, "action": action, "id": id}
@@ -64,40 +68,45 @@ def create_licitacion(request, action, id):
     data["list"] = Licitacion.objects.all().order_by('idLicitacion')
     return render(request, "core/creacion_de_licitaciones.html", data)
 
+#### MANTENEDOR DE PREGUNTAS #############################################
+@login_required
 def mantenedor_preguntas(request, action, id):
-    data = {"mesg": "", "form": PreguntasForm, "action": action, "id": id}
+    data = {"mesg": "", "action": action, "id": id}
 
     if action == 'ins':
         if request.method == "POST":
             form = PreguntasForm(request.POST, request.FILES)
-            if form.is_valid:
+            if form.is_valid():
                 try:
                     form.save()
                     data["mesg"] = "¡La Pregunta fue creada correctamente!"
                 except:
                     data["mesg"] = "¡No se puede crear dos Preguntas con la misma id!"
+        else:
+            form = PreguntasForm()
 
     elif action == 'upd':
         objeto = Preguntasbbdd.objects.get(idPreguntas=id)
         if request.method == "POST":
-            form = PreguntasForm(data=request.POST, files=request.FILES, instance=objeto)
-            if form.is_valid:
+            form = PreguntasForm(request.POST, request.FILES, instance=objeto)
+            if form.is_valid():
                 form.save()
                 data["mesg"] = "¡La Pregunta fue actualizada correctamente!"
-        data["form"] = PreguntasForm(instance=objeto)
+        else:
+            form = PreguntasForm(instance=objeto)
 
     elif action == 'del':
         try:
             Preguntasbbdd.objects.get(idPreguntas=id).delete()
             data["mesg"] = "¡La Pregunta fue eliminada correctamente!"
-            return redirect(Preguntasbbdd, action='ins', id = '-1')
+            return redirect('mantenedor_preguntas', action='ins', id='-1')
         except:
             data["mesg"] = "¡La Pregunta ya estaba eliminada!"
-
     data["list"] = Preguntasbbdd.objects.all().order_by('idPreguntas')
+    data["form"] = form
     return render(request, "core/mantenedor_preguntas.html", data)
 
-# INGRESO DE SESION :
+##### INGRESO DE SESION ###################################################
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -181,12 +190,5 @@ def vendedor(request):
 def gerente(request):
     return render(request, 'core/gerente.html')
 
-# PREGUNTAS #
 
-
-# SUBIR ARCHIVO PDF #
-
-
-###################################################################
-# SUBIR ARCHIVO PDF #
 
