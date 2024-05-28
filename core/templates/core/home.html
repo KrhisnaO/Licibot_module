@@ -4,6 +4,7 @@
 
 {% block stylesheet %}
 <link rel="stylesheet" href="{% static 'core/css/home.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/textomovil.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -24,8 +25,42 @@
     </div>
 </div>
 
+<div class="marquee-container">
+    <div class="marquee" id="marquee">
+        <ul class="licitaciones-container">
+            <span>| Version actual 0.5 |</span>
+            <span>
+                | Hay {{ lici_count }} licitaciones guardadas |
+            </span>
+            <span>
+                | Hay {{ preg_count }} preguntas guardadas |
+            </span>
+        </ul>
+    </div>
+</div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const marquee = document.getElementById('marquee');
+        const containerWidth = document.querySelector('.marquee-container').offsetWidth;
+        const marqueeWidth = marquee.offsetWidth;
+        let currentPos = containerWidth;
+
+        function animateMarquee() {
+            currentPos -= 2; // Velocidad del desplazamiento
+            if (currentPos < -marqueeWidth) {
+                currentPos = containerWidth;
+            }
+            marquee.style.transform = `translateX(${currentPos}px)`;
+            requestAnimationFrame(animateMarquee);
+        }
+        animateMarquee();
+    });
+</script>
 
 {% endblock %}
+
+
+
 
 
