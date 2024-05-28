@@ -4,12 +4,14 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 
 class Licitacion(models.Model):
-    idLicitacion = models.IntegerField(primary_key=True, verbose_name="Id de licitación")
+    idLicitacion = models.CharField(max_length=20, primary_key=True, verbose_name="Id de licitación")
     nombreLicitacion = models.CharField(max_length=80, blank=False, null=False, verbose_name="Nombre de la licitación")
-    archivoLicitacion = models.FileField(upload_to="media/", null=True, blank=True,  verbose_name="Archivo de la licitación")
+    descripcionLicitacion = models.TextField(max_length=5000, null=True, blank=True, verbose_name="Descripción de la licitación")
+    archivoLicitacion = models.FileField(upload_to="licitaciones/%Y/%m/%d/", null=True, blank=True, verbose_name="Archivo de la licitación")
 
     def __str__(self):
         return self.nombreLicitacion
+
 
 # PREGUNTAS LICIBOT #
 class Preguntasbbdd(models.Model):

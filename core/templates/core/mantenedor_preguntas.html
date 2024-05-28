@@ -1,16 +1,15 @@
-{% extends 'core/base.html' %}
+{% extends 'core/administrador.html' %}
+
 {% load static %}
 
 {% block stylesheet %}
 <link rel="stylesheet" href="{% static 'core/css/creadores.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/menu.css' %}">
 {% endblock %}
 
-{% block content %}
+{% block admin_content %}
 <div class="container">
-    <h1 style="text-align: center !important;">
-        Mantenedor de Preguntas
-    </h1>
-    <br>
+    <h3>Mantenedor de Preguntas</h3>
     {% if form %}
     <form method="POST" action="" enctype="multipart/form-data" id="formulario">
         <br>
@@ -50,4 +49,6 @@
     </table>
     {% endif %}
 </div>
+
+
 {% endblock %}

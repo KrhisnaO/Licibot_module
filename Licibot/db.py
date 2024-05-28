@@ -23,6 +23,12 @@ MYSQL = {
 
 #####################################
 ## conexion pagina web
+## USUARIOS 
 ## USER ADMIN
 ## CORREO admin@gmail.com   
 ## Licibot@ad1
+
+#CREATE DATABASE licibot
+#CREATE USER 'licibotuser'@'%' IDENTIFIED BY 'Licibot_2.0';
+#GRANT ALL PRIVILEGES ON licibot.* TO 'licibotuser'@'%';
+#FLUSH PRIVILEGES;

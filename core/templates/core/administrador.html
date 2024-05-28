@@ -1,22 +1,47 @@
 {% extends 'core/base.html' %}
+{% load static %}
+
+{% block stylesheet %}
+<link rel="stylesheet" href="{% static 'core/css/menu.css' %}">
+{% endblock %}
+
+{% block custom_script %}
+<script src="{% static 'core/js/menu.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 <h2 class="text-center">Menú Administración</h2>
 <br>
 <br>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-3">
-                <div class="list-group">
-                    <a href="{% url 'crear_usuario' %}" class="list-group-item list-group-item-action">Crear Usuario</a>
-                    <a href="{% url 'historial_usu' %}" class="list-group-item list-group-item-action">Historial de Usuarios</a>
-                    <a href="{% url 'creacion_de_licitaciones' action='ins' id=-1 %}" class="list-group-item list-group-item-action">Mantenedor de Licitaciones</a>
-                    <a href="{% url 'mantenedor_preguntas' action='ins' id=-1 %}" class="list-group-item list-group-item-action">Mantenedor de preguntas</a>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="{% url 'crear_usuario' %}" class="fa fa-user list-group-item list-group-item-action menu-item"> 
+                    <span>Crear Usuario</span>
+                </a>
+
+                <a href="{% url 'historial_usu' %}" class="fa fa-clock-o list-group-item list-group-item-action menu-item">
+                    <span class="menu-link">Historial de Usuarios</span>
+                </a>
+
+                <div class="list-group-item list-group-item-action menu-item" id="submenu-licitaciones">
+                    <span class="fa fa-gavel"> Mantenedor de Licitaciones</span>
+                    <div class="submenu">
+                        <a href="{% url 'buscar_lici' %}" class="submenu-item">Buscar Licitaciones</a>
+                        <a href="{% url 'historial_lici' %}" class="submenu-item">Historial de Licitaciones</a>
+                        <a href="{% url 'subir_archivo'  %}" class="submenu-item">Subir archivos</a>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-9">
-                {% block admin_content %}{% endblock %}
+
+                <a href="{% url 'mantenedor_preguntas' action='ins' id=-1 %}" class="fa fa-question-circle list-group-item list-group-item-action menu-item">
+                    <span class="menu-link">Mantenedor de preguntas</span>
+                </a>
             </div>
         </div>
+        <div class="col-md-9">
+            {% block admin_content %}{% endblock %}
+        </div>
     </div>
+</div>
 {% endblock %}

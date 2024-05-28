@@ -1,72 +1,17 @@
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import CustomUser, Licitacion, Preguntasbbdd
-from .forms import LoginForm, CreateUserForm, LicitacionForm, PreguntasForm
+from .forms import LoginForm, CreateUserForm, LicitacionForm, PreguntasForm, SubirArchivoForm
 import requests
+
+from .utils import obtener_licitaciones
 
 # Create your views here.
 
-## SE UTILIZA HOME PARA QUE LA API CORRA UNA VEZ INICIADA LA PAGINA WEB ##
-
 def home(request):
-    # CONSULTA POR LICITACIONES ACTIVAS
-    url_api = "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json?estado=activas&ticket=F8537A18-6766-4DEF-9E59-426B4FEE2844"
-
-    # Envía una solicitud GET a la URL de la API
-    respuesta = requests.get(url_api)
-
-    # Verifica si la solicitud fue exitosa
-    if respuesta.status_code == 200:
-        # Convierte la respuesta en un objeto JSON
-        datos = respuesta.json()
-        listado = datos.get('Listado', [])
-
-        # Filtra las licitaciones que contienen 'oFicinA' en el nombre
-        licitaciones_filtradas = [licitacion for licitacion in listado if 'oFicinA'.upper() in licitacion.get('Nombre', '').upper()]
-
-        # Renderiza el template con el listado de licitaciones filtradas como contexto
-        return render(request, 'core/home.html', {'licitaciones': licitaciones_filtradas})
-    else:
-        # Si la solicitud no fue exitosa, devuelve un mensaje de error
-        return render(request, 'core/home.html', {'error_message': 'No se pudieron obtener las licitaciones'})
-
-
-#### SUBIR ARCHIVO PDF #########################################################
-@login_required
-def create_licitacion(request, action, id):
-    data = {"mesg": "", "form": LicitacionForm, "action": action, "id": id}
-
-    if action == 'ins':
-        if request.method == "POST":
-            form = LicitacionForm(request.POST, request.FILES)
-            if form.is_valid:
-                try:
-                    form.save()
-                    data["mesg"] = "¡La Licitacion fue creada correctamente!"
-                except:
-                    data["mesg"] = "¡No se puede crear dos licitaciones con la misma id!"
-
-    elif action == 'upd':
-        objeto = Licitacion.objects.get(idLicitacion=id)
-        if request.method == "POST":
-            form = LicitacionForm(data=request.POST, files=request.FILES, instance=objeto)
-            if form.is_valid:
-                form.save()
-                data["mesg"] = "¡La Licitacion fue actualizada correctamente!"
-        data["form"] = LicitacionForm(instance=objeto)
-
-    elif action == 'del':
-        try:
-            Licitacion.objects.get(idLicitacion=id).delete()
-            data["mesg"] = "¡La Licitacion fue eliminada correctamente!"
-            return redirect(Licitacion, action='ins', id = '-1')
-        except:
-            data["mesg"] = "¡La Licitacion ya estaba eliminada!"
-
-    data["list"] = Licitacion.objects.all().order_by('idLicitacion')
-    return render(request, "core/creacion_de_licitaciones.html", data)
+    return render(request, 'core/home.html')
 
 #### MANTENEDOR DE PREGUNTAS #############################################
 @login_required
@@ -104,6 +49,11 @@ def mantenedor_preguntas(request, action, id):
             data["mesg"] = "¡La Pregunta ya estaba eliminada!"
     data["list"] = Preguntasbbdd.objects.all().order_by('idPreguntas')
     data["form"] = form
+
+    # Limpiar los mensajes después de recuperarlos
+    storage = messages.get_messages(request)
+    storage.used = False
+
     return render(request, "core/mantenedor_preguntas.html", data)
 
 ##### INGRESO DE SESION ###################################################
@@ -160,6 +110,10 @@ def crear_usuario(request):
     else:
         form = CreateUserForm()
 
+    # Limpiar los mensajes después de recuperarlos
+    storage = messages.get_messages(request)
+    storage.used = False
+
     return render(request, 'core/crear_usuario.html', {'form': form})
 
 
@@ -167,6 +121,11 @@ def crear_usuario(request):
 @login_required
 def historial_usu(request):
     usuarios = CustomUser.objects.all()  
+
+    # Limpiar los mensajes después de recuperarlos
+    storage = messages.get_messages(request)
+    storage.used = False
+
     return render(request, 'core/historial_usu.html', {'usuarios': usuarios})
 
 # CERRAR SESION ##
@@ -190,5 +149,72 @@ def vendedor(request):
 def gerente(request):
     return render(request, 'core/gerente.html')
 
+# BUSCAR LICITACIONES #
+@login_required
+def buscar_lici(request):
+    filtro_id = request.GET.get('id', None)
+    filtro_palabra_clave = request.GET.get('palabra_clave', None)
+    
+    licitaciones = None
+    if filtro_id or filtro_palabra_clave:
+        licitaciones = obtener_licitaciones(filtro_id=filtro_id, filtro_palabra_clave=filtro_palabra_clave)
+    
+    if licitaciones is not None:
+        if request.method == 'POST':
+            # Procesar el formulario de guardado
+            id_licitacion = request.POST.get('id_licitacion')
+            nombre_licitacion = request.POST.get('nombre_licitacion')
+            descripcion_licitacion = request.POST.get('descripcion_licitacion')
+            
+            # Verificar si la licitación ya existe en la base de datos
+            if not Licitacion.objects.filter(idLicitacion=id_licitacion).exists():
+                Licitacion.objects.create(
+                    idLicitacion=id_licitacion,
+                    nombreLicitacion=nombre_licitacion,
+                    descripcionLicitacion=descripcion_licitacion
+                )
+                messages.success(request, '¡La licitación ha sido guardada con éxito!')
+            else:
+                messages.warning(request, 'La licitación ya existe en la base de datos.')
+            return redirect('buscar_lici')
+        
+        return render(request, 'core/buscar_lici.html', {'licitaciones': licitaciones})
+    elif filtro_id or filtro_palabra_clave:
+        return render(request, 'core/buscar_lici.html', {'error_message': 'No se encontraron licitaciones con los criterios proporcionados.'})
+    else:
+        return render(request, 'core/buscar_lici.html')
 
+# HISTORIAL LICITACIONES #
+@login_required
+def historial_lici(request):
+    licitaciones_guardadas = Licitacion.objects.all()
+    return render(request, 'core/historial_lici.html', {'licitaciones_guardadas': licitaciones_guardadas})
+
+# SUBIR ARCHIVO DE LICITACIONES #
+@login_required
+def subir_archivo(request):
+    licitacion_id = request.GET.get('id', None)
+    licitacion = None
+
+    if licitacion_id:
+        licitacion = get_object_or_404(Licitacion, idLicitacion=licitacion_id)
+
+    if request.method == 'POST':
+        form = SubirArchivoForm(request.POST, request.FILES, instance=licitacion if licitacion else None)
+        if form.is_valid():
+            archivo = form.cleaned_data.get('archivoLicitacion')
+            if archivo:
+                if licitacion:
+                    licitacion.archivoLicitacion = archivo
+                    licitacion.save(update_fields=['archivoLicitacion'])
+                    messages.success(request, '¡El archivo ha sido subido con éxito!')
+                    return redirect('subir_archivo')
+                else:
+                    messages.warning(request, 'No se ha seleccionado ninguna licitación.')
+            else:
+                messages.warning(request, 'No se ha seleccionado ningún archivo para subir.')
+    else:
+        form = SubirArchivoForm(instance=licitacion)
+
+    return render(request, 'core/subir_archivo.html', {'form': form, 'licitacion': licitacion})
 

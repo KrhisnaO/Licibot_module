@@ -9,7 +9,20 @@ class LoginForm(forms.Form):
 class LicitacionForm(forms.ModelForm):
     class Meta:
         model = Licitacion
-        fields = ['idLicitacion', 'nombreLicitacion', 'archivoLicitacion']
+        fields = ['idLicitacion', 'nombreLicitacion', 'descripcionLicitacion', 'archivoLicitacion']
+    
+## SE AGREGA PARA CUANDO SE SUBA UN ARCHIVO NO SE SOBREESCRIBA EN LA BBDD
+class SubirArchivoForm(forms.ModelForm):
+    class Meta:
+        model = Licitacion
+        fields = ['archivoLicitacion']
+    
+    def __init__(self, *args, **kwargs):
+        super(SubirArchivoForm, self).__init__(*args, **kwargs)
+        # Campos de idLicitacion y nombreLicitacion solo lectura
+        self.fields['idLicitacion'] = forms.CharField(initial=self.instance.idLicitacion, required=False, widget=forms.TextInput(attrs={'readonly': 'readonly', 'class': 'form-control'}))
+        self.fields['nombreLicitacion'] = forms.CharField(initial=self.instance.nombreLicitacion, required=False, widget=forms.TextInput(attrs={'readonly': 'readonly', 'class': 'form-control'}))
+        self.fields['descripcionLicitacion'] = forms.CharField(initial=self.instance.descripcionLicitacion, required=False, widget=forms.Textarea(attrs={'readonly': 'readonly', 'class': 'form-control', 'rows': 5}))
 
 class PreguntasForm(forms.ModelForm):
     class Meta:

@@ -77,6 +77,7 @@ WSGI_APPLICATION = 'Licibot.wsgi.application'
 
 # Database with MSQL
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+
 DATABASES = MYSQL
 
 # Password validation

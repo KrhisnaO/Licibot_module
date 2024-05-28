@@ -1,0 +1,39 @@
+{% extends 'core/administrador.html' %}
+
+{% block admin_content %}
+    <h3>Historial de Licitaciones</h3>
+    
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID de Licitación</th>
+                <th>Nombre de Licitación</th>
+                <th>Descripción de Licitación</th>
+                <th>Archivo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for licit in licitaciones_guardadas %}
+            <tr>
+                <td>{{ licit.idLicitacion }}</td>
+                <td>{{ licit.nombreLicitacion }}</td>
+                <td>{{ licit.descripcionLicitacion }}</td>
+                <td>
+                    {% if licit.archivoLicitacion %}
+                        <a href="{{ licit.archivoLicitacion.url }}" target="_blank" title="Ver PDF">
+    
+                            {{ licit.archivoLicitacion }}
+                        </a>
+                    {% else %}
+                        sin archivo
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'subir_archivo' %}?id={{ licit.idLicitacion }}" class="btn btn-primary">Editar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

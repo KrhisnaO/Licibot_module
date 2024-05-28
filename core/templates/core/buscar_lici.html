@@ -1,0 +1,77 @@
+{% extends 'core/administrador.html' %}
+
+{% load static %}
+
+<!-- ARCHIVOS JS -->
+{% block custom_script %}
+<script src="{% static 'core/js/search.js' %}"></script>
+<script src="{% static 'core/js/menu.js' %}"></script>
+{% endblock %}
+
+{% block admin_content %}
+<h3>Buscar Licitaciones</h3>
+
+<!-- MENSAJES DE ERROR -->
+{% if error_message %}
+    <div class="alert alert-danger">{{ error_message }}</div>
+{% endif %}
+
+{% if messages %}
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+{% endif %}
+
+<form method="get" action="{% url 'buscar_lici' %}" id="search-form">
+    <div class="form-group">
+        <label for="id">ID de Licitación:</label>
+        <input type="text" name="id" id="id" class="form-control" value="{{ request.GET.id }}">
+    </div>
+    <div class="form-group">
+        <label for="palabra_clave">Palabra Clave:</label>
+        <input type="text" name="palabra_clave" id="palabra_clave" class="form-control" value="{{ request.GET.palabra_clave }}">
+    </div>
+    <button type="submit" class="btn btn-primary" id="search-button">Buscar</button>
+    <button type="button" class="btn btn-secondary" id="clear-button">Limpiar</button>
+</form>
+<br>
+<div class="alert alert-warning" id="search-warning" style="display: none;">
+    Por favor, ingrese un ID de licitación o una palabra clave para buscar.
+</div>
+
+{% if licitaciones %}
+    <h3>Resultados de la Búsqueda:</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Acción</th> 
+            </tr>
+        </thead>
+        <tbody>
+            {% for licitacion in licitaciones %}
+            <tr>
+                <td>{{ licitacion.CodigoExterno }}</td>
+                <td>{{ licitacion.Nombre }}</td>
+                <td>{{ licitacion.Descripcion }}</td>
+                <td> 
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <input type="hidden" name="id_licitacion" value="{{ licitacion.CodigoExterno }}">
+                        <input type="hidden" name="nombre_licitacion" value="{{ licitacion.Nombre }}">
+                        <input type="hidden" name="descripcion_licitacion" value="{{ licitacion.Descripcion }}">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+{% endif %}
+{% endblock %}
+
+
+
