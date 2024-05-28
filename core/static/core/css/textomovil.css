@@ -1,0 +1,37 @@
+.marquee-container {
+    width: 100%; /* Ancho del contenedor al 100% del ancho de la página */
+    overflow: hidden;
+    background-color: #ffffff; /* Fondo del contenedor */
+    position: relative;
+    height: 50px; /* Ajusta la altura según tus necesidades */
+}
+
+.marquee {
+    display: inline-block;
+    white-space: nowrap;
+    position: relative;
+    will-change: transform;
+    background-color: #ffffff; /* Fondo del texto en movimiento */
+    padding: 10px; /* Espaciado alrededor del texto */
+    font-size: 1.2em; /* Tamaño de la fuente */
+    color: #000; /* Color del texto */
+    display: flex; /* Cambiar el diseño de la lista a horizontal */
+}
+
+.marquee span {
+    display: inline-block;
+    background-color: #ffffff; /* Fondo del texto en movimiento */
+    font-size: 1.2em; /* Tamaño de la fuente */
+    color: #000; /* Color del texto */
+    margin-right: 20px; /* Espacio entre oraciones */
+}
+
+.licitaciones-container {
+    display: flex; /* Cambiar el diseño de la lista a horizontal */
+    list-style-type: none; /* Eliminar los puntos de la lista */
+    padding: 0; /* Eliminar el relleno predeterminado */
+}
+
+.licitaciones-container li {
+    margin-right: 20px; /* Ajustar el espaciado entre los elementos de la lista */
+}
