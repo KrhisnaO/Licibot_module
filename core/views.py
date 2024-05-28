@@ -11,7 +11,9 @@ from .utils import obtener_licitaciones
 # Create your views here.
 
 def home(request):
-    return render(request, 'core/home.html')
+    lici_count = Licitacion.objects.count()
+    preg_count = Preguntasbbdd.objects.count()
+    return render(request, 'core/home.html', {'lici_count': lici_count, 'preg_count': preg_count})
 
 #### MANTENEDOR DE PREGUNTAS #############################################
 @login_required
