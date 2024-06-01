@@ -1,0 +1,134 @@
+/* Variables para colores de fila seleccionada, texto de fila seleccionada y filas alternadas */
+:root {
+    --dt-row-selected: rgb(51, 122, 183);
+    --dt-row-selected-text: rgb(255, 255, 255);
+    --dt-row-stripe: rgb(248, 248, 248);
+}
+
+/* Modo oscuro */
+body.dark-mode .dataTable {
+    background-color: rgb(30, 30, 30);
+    border-color: rgb(50, 50, 50);
+}
+
+/* Estilos de filas y columnas */
+.dt-control {
+    cursor: pointer;
+}
+
+.dt-hasChild::before {
+    content: "\25B6"; /* flecha hacia la derecha */
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.dt-hasChild.expanded::before {
+    content: "\25BC"; /* flecha hacia abajo */
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--dt-row-stripe);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.075);
+}
+
+tr.selected {
+    background-color: var(--dt-row-selected) !important;
+    color: var(--dt-row-selected-text) !important;
+}
+
+/* Tablas desplazables */
+div.dt-scroll-body {
+    overflow: auto;
+    width: 100%;
+}
+
+/* Ordenación y clasificación */
+th.sorting::after,
+th.sorting_asc::after,
+th.sorting_desc::after {
+    display: inline-block;
+    margin-left: 10px;
+    vertical-align: middle;
+    font-size: 0.8em;
+    opacity: 0.5;
+}
+
+th.sorting::after {
+    content: "\25B2\25BC"; /* flechas hacia arriba y hacia abajo */
+}
+
+th.sorting_asc::after {
+    content: "\25B2"; /* flecha hacia arriba */
+}
+
+th.sorting_desc::after {
+    content: "\25BC"; /* flecha hacia abajo */
+}
+
+/* Encabezados y pies de tabla */
+thead th, tfoot th {
+    padding: 10px;
+    border-bottom: 2px solid #ddd;
+}
+
+/* Alineación de texto */
+.dt-left {
+    text-align: left;
+}
+
+.dt-center {
+    text-align: center;
+}
+
+.dt-right {
+    text-align: right;
+}
+
+/* Indicador de procesamiento */
+div.dt-processing {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    font-size: 1.2em;
+    color: #999;
+}
+
+/* Filas alternadas */
+table.dataTable.stripe tbody tr:nth-child(odd) {
+    background-color: var(--dt-row-stripe);
+}
+
+/* Bordes de celda */
+table.dataTable.cell-border tbody td, table.dataTable.cell-border tbody th {
+    border: 1px solid #ddd;
+}
+
+/* Resaltado de fila seleccionada */
+tr.selected {
+    background-color: var(--dt-row-selected) !important;
+    color: var(--dt-row-selected-text) !important;
+}
+
+/* Animaciones */
+@keyframes datatables-loader-1 {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Botones de paginación */
+div.dt-container .dt-paging .dt-paging-button.current,
+div.dt-container .dt-paging .dt-paging-button.current:hover {
+    color: inherit !important;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.05);
+    background: linear-gradient(to bottom, rgba(230, 230, 230, 0.05) 0%, rgba(0, 0, 0, 0.05) 100%);
+}
