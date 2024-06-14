@@ -1,0 +1,139 @@
+@import url('https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css');
+/*NOTA: PARA LOS BOTONES USAR EL TIPO DE BOTON DE DANGER*/
+
+
+
+
+
+/*GENERAL (AFECTA A TODO EL SISTEMA)*/
+body {
+    font-family: Arial, sans-serif;  
+    
+}
+
+/*color de todo los titulos*/
+#coltit{
+    color: #e02030;
+}
+
+/*color blanco en caso de que se quiera dejar algo blanco*/
+#colblanc{
+    color: #ffffff;
+}
+
+/*NAVBAR*/
+#navbar{
+    font-weight: bold;
+    background: linear-gradient(to right, #443880, #e02030);
+    height: 100%; /* Asegura que el fondo cubra toda la altura de la página */
+    margin: 0;
+}
+
+/*texto en el navbar*/
+
+/*Saludo al usuario*/
+#saludo{
+    color: #494949a1;
+}
+
+
+.navbar-brand {
+    color: #ffffff; /* Color de enlace */
+    background-color: rgba(0, 0, 0, 0);/*Fondo traslucido para que el navbar se vea bien*/
+}
+
+.navbar-nav .nav-link {
+    color: #ffffff; /* Color de enlace */
+    background-color: rgba(0, 0, 0, 0);/*Fondo traslucido para que el navbar se vea bien*/
+}
+
+
+
+/*HOME*/
+.info-box {
+    background-color: #e6e6e6; 
+    border: 3px solid #46377f; 
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+}
+
+.info-box h2 {
+    color: #46377f; /* Color de título */
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.info-box p {
+    color: #46377f; /* Color de texto  */
+    line-height: 1.6;
+}
+
+
+
+/*ADMINISTRADOR*/
+
+/* Ajustes del menú */
+.menu-item {
+    background: linear-gradient(to right, #443880, #e02030);
+
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.menu-item:hover {
+    background-color: #e0e0e0;
+}
+
+.menu-link {
+    color: #ffffff;
+}
+
+.menu-link:hover {
+    color: #a7a7a7;
+}
+
+/*cuando se presiona un boton*/
+.menu-item.active {
+    background-color: #e02030;
+    border-color: #e02030;
+    color: #ffffff;
+}
+
+/*Cambiar el color de los iconos*/
+.fa {
+    color: #ffffff; /* Azul Bootstrap predeterminado */
+}
+
+/* Ajustes del sub-menú */
+.submenu {
+    display: none;
+}
+.submenu-item {
+    display: block;
+    padding: 8px 16px;
+    color: #ffffff;
+    text-decoration: none;
+}
+.submenu-item:hover {
+    background-color: #e02030;
+    color: #ffffff;
+    text-decoration: none; 
+}
+
+#submenu-licitaciones.active .submenu {
+    display: block;
+}
+
+.list-group-item-action:hover {
+    color: #a7a7a7; /* Color del texto al pasar el ratón */
+
+}
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
+/**/
