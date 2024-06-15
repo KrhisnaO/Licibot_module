@@ -6,15 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Licibot</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{% static 'core/css/home.css' %}">
-    <link rel="stylesheet" href="{% static 'core/css/datable.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/general.css' %}">
     <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css">
     {% block stylesheet %}{% endblock %}
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{% url 'home' %}">Licibot</a>
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-light bg-light">
+        <a id="colblanc" class="navbar-brand" href="{% url 'home' %}">Licibot</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -30,7 +29,7 @@
                         </li>
                     {% endif %}
                     <li class="nav-item">
-                        <span class="nav-link disabled" style="font-size: 1.2em;">Hola, {{ user.username }}</span>
+                        <span id="saludo" class="nav-link disabled" style="font-size: 1.2em;">Hola, {{ user.username }}</span>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'cerrar_sesion' %}" style="font-size: 1.2em;">Cerrar sesión</a>
