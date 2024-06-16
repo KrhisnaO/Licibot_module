@@ -13,7 +13,7 @@ body {
 
 /*color de todo los titulos*/
 #coltit{
-    color: #e02030;
+    color: #000000;
 }
 
 /*color blanco en caso de que se quiera dejar algo blanco*/
@@ -26,6 +26,13 @@ body {
 #fondocol{
     background: linear-gradient(to right, #443880, #e02030);
 }
+
+/*fondo de color*/
+#fondocollog{
+    background: linear-gradient(to right, #443880, #e02030);
+    border: 2px solid #000000; 
+}
+
 
 /*NAVBAR*/
 #navbar{
@@ -149,7 +156,77 @@ body {
 .card-body{
     text-align: justify;
 }
-/**/
+
+#crearusu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#coltit {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+#tabmensaj {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+#tabmensaj #mensaj {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 3px;
+}
+
+/* General styling for form */
+#form1 {
+    width: 100%;
+}
+
+#form1 p {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+#form1 label {
+    flex: 1;
+    text-align: right;
+    margin-right: 1rem;
+}
+
+#form1 input[type="text"],
+#form1 input[type="password"],
+#form1 input[type="email"],
+#form1 select,
+#form1 textarea {
+    flex: 2;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    width: 100%;
+}
+
+#iddivboton {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+#idboton {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 3px;
+
+}
+
+
 /**/
 /**/
 /**/
