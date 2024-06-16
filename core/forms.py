@@ -29,27 +29,27 @@ class PreguntasForm(forms.ModelForm):
         model = Preguntasbbdd
         fields = ['idPreguntas', 'nombrePregunta']
 
+# USUARIOS #
 class CreateUserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput())
+    password = forms.CharField(widget=forms.PasswordInput(), label='Contraseña')
     group = forms.ModelChoiceField(queryset=Group.objects.all(), empty_label=None, label='Rol')
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'password', 'first_name', 'last_name', 'email', 'rut', 'group']
+        fields = ['email', 'password', 'first_name', 'last_name', 'rut', 'group']
         labels = {
-            'username': 'Nombre de usuario',
+            'email': 'Correo electrónico',
             'password': 'Contraseña',
             'first_name': 'Nombre',
             'last_name': 'Apellido',
-            'email': 'Correo electrónico',
             'rut': 'RUT',
         }
 
     def save(self, commit=True):
-        user = super(CreateUserForm, self).save(commit=False)
-        user.email = self.cleaned_data['email']
+        user = super().save(commit=False)
+        user.username = self.cleaned_data['email']
         user.set_password(self.cleaned_data['password'])
-        user.groups.add(self.cleaned_data['group'])
         if commit:
             user.save()
+            user.groups.add(self.cleaned_data['group'])
         return user

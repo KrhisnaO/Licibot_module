@@ -10,8 +10,8 @@ admin.site.register(Preguntasbbdd)
 
 class CustomUserAdmin(BaseUserAdmin):
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'rut')}),
+        (None, {'fields': ('email', 'password')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'rut')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser',
                                     'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
@@ -19,11 +19,11 @@ class CustomUserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'password1', 'password2'),
+            'fields': ('email', 'password1', 'password2', 'first_name', 'last_name', 'rut'),
         }),
     )
-    list_display = ('username', 'email', 'first_name', 'last_name', 'rut', 'is_staff')
-    search_fields = ('username', 'email', 'first_name', 'last_name', 'rut')
-    ordering = ('username',)
+    list_display = ('email', 'first_name', 'last_name', 'rut', 'is_staff')
+    search_fields = ('email', 'first_name', 'last_name', 'rut')
+    ordering = ('email',)
 
 admin.site.register(CustomUser, CustomUserAdmin)

@@ -105,6 +105,15 @@ REST_FRAMEWORK = {
 }
 
 
+# Indica a Django que use el modelo de usuario personalizado
+AUTH_USER_MODEL = 'core.CustomUser'
+
+# Asegura que el backend de autenticación use el email
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 

@@ -1,0 +1,28 @@
+{% extends 'core/administrador.html' %}
+
+{% block admin_content %}
+    <h3>Historial de Errores</h3>
+    
+    <table id="tablaerrores" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Vista</th>
+                <th>Descripción del Error</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for error in errores %}
+            <tr>
+                <td>{{ error.tipo_vista }}</td>
+                <td>{{ error.descripcion }}</td>
+                <td>{{ error.fecha }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No hay errores registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

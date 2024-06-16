@@ -6,15 +6,18 @@ MYSQL = {
         'PASSWORD': 'Licibot_2.0',
         'HOST': 'localhost',
         'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
     }
 }
 
 ############################
 ## COMO CREE LA BBDD
 ## EN LA TERMINAL 
-#CREATE DATABASE licibot
+#CREATE DATABASE licibot;
 #CREATE USER 'licibotuser'@'localhost' IDENTIFIED BY 'Licibot_2.0';
-#GRANT ALL PRIVILEGES ON licibot.* TO 'licibotuser'@'localhost';
+#GRANT ALL PRIVILEGES ON licibot.* TO 'licibotus'@'localhost';
 #FLUSH PRIVILEGES;
 
 ### CONEXION BBDD PROYECTO  ##
@@ -27,8 +30,3 @@ MYSQL = {
 ## USER ADMIN
 ## CORREO admin@gmail.com   
 ## Licibot@ad1
-
-#CREATE DATABASE licibot
-#CREATE USER 'licibotuser'@'%' IDENTIFIED BY 'Licibot_2.0';
-#GRANT ALL PRIVILEGES ON licibot.* TO 'licibotuser'@'%';
-#FLUSH PRIVILEGES;

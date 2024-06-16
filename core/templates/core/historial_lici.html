@@ -8,9 +8,9 @@
             <tr>
                 <th>ID de Licitación</th>
                 <th>Nombre de Licitación</th>
-                <th>Descripción de Licitación</th>
                 <th>Archivo</th>
                 <th>Acciones</th>
+                <th>Leer PDF</th>
             </tr>
         </thead>
         <tbody>
@@ -18,11 +18,9 @@
             <tr>
                 <td>{{ licit.idLicitacion }}</td>
                 <td>{{ licit.nombreLicitacion }}</td>
-                <td>{{ licit.descripcionLicitacion }}</td>
                 <td>
                     {% if licit.archivoLicitacion %}
                         <a href="{{ licit.archivoLicitacion.url }}" target="_blank" title="Ver PDF">
-    
                             {{ licit.archivoLicitacion }}
                         </a>
                     {% else %}
@@ -31,6 +29,13 @@
                 </td>
                 <td>
                     <a href="{% url 'subir_archivo' %}?id={{ licit.idLicitacion }}" class="btn btn-primary">Editar</a>
+                </td>
+                <td>
+                    {% if licit.archivoLicitacion and licit.idLicitacion %}
+                        <a href="{% url 'seleccionar_preguntas' licit.idLicitacion %}" class="btn btn-primary">Seleccionar Preguntas</a>
+                    {% else %}
+                        <button class="btn btn-secondary" disabled>Seleccionar Preguntas</button>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

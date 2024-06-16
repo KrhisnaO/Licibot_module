@@ -1,0 +1,27 @@
+{% extends 'core/administrador.html' %}
+
+{% block admin_content %}
+<h3>Seleccionar Preguntas para Licitación {{ licitacion.idLicitacion }}</h3>
+<form method="post">
+    {% csrf_token %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Seleccionar</th>
+                <th>Pregunta</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pregunta in preguntas %}
+            <tr>
+                <td>
+                    <input type="checkbox" name="preguntas" value="{{ pregunta.idPreguntas }}">
+                </td>
+                <td>{{ pregunta.nombrePregunta }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Leer PDF</button>
+</form>
+{% endblock %}

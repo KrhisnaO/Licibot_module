@@ -15,5 +15,8 @@ urlpatterns = [
     path('buscar_lici/', views.buscar_lici, name='buscar_lici'),
     path('historial_lici/', views.historial_lici, name='historial_lici'),
     path('subir_archivo/', views.subir_archivo, name='subir_archivo'),
+    path('leer_pdf/<str:id>/', views.leer_pdf, name='leer_pdf'),
+    path('seleccionar_preguntas/<str:licitacion_id>/', views.seleccionar_preguntas, name='seleccionar_preguntas'),
+    path('historial_errores/', views.historial_errores, name='historial_errores'),
 ]
 

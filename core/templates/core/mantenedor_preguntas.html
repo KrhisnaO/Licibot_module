@@ -8,13 +8,26 @@
 {% endblock %}
 
 {% block admin_content %}
-<div class="container">
-    <h3 id="coltit">Mantenedor de Preguntas</h3>
+
+    <h3 id="coltit"> Mantenedor de Preguntas</h3>
+<!-- MENSAJES DE ERROR -->
+{% if error_message %}
+    <div class="alert alert-danger">{{ error_message }}</div>
+{% endif %}
+
+{% if messages %}
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+{% endif %}
+
     {% if form %}
-    <form method="POST" action="" enctype="multipart/form-data" id="formulario">
+    <form method="post" enctype="multipart/form-data">
         <br>
+        {% csrf_token %}
         <div class="form-group">
-            {% csrf_token %} {{ form.as_p }}
+            <label for="nombrePregunta"> Pregunta: </label>
+            {{ form.nombrePregunta }}
         </div>
 
         <input type="submit" class="btn btn-primary btnwidth" id="id_guardar" value="Guardar">
@@ -27,6 +40,7 @@
         {% endif %}
     </form>
     {% endif %}
+    <br>
     {% if list %}
     <table id="tabladate" class="table table-bordered">
         <thead>
@@ -48,7 +62,7 @@
         </tbody>
     </table>
     {% endif %}
-</div>
+
 
 
 {% endblock %}

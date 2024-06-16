@@ -46,7 +46,6 @@
             <tr>
                 <th>ID</th>
                 <th>Nombre</th>
-                <th>Descripción</th>
                 <th>Acción</th> 
             </tr>
         </thead>
@@ -55,13 +54,11 @@
             <tr>
                 <td>{{ licitacion.CodigoExterno }}</td>
                 <td>{{ licitacion.Nombre }}</td>
-                <td>{{ licitacion.Descripcion }}</td>
                 <td> 
                     <form method="post" action="">
                         {% csrf_token %}
                         <input type="hidden" name="id_licitacion" value="{{ licitacion.CodigoExterno }}">
                         <input type="hidden" name="nombre_licitacion" value="{{ licitacion.Nombre }}">
-                        <input type="hidden" name="descripcion_licitacion" value="{{ licitacion.Descripcion }}">
                         <button type="submit" class="btn btn-primary">Guardar</button>
                     </form>
                 </td>
