@@ -1,49 +1,5 @@
-@import url('https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css');
-
-/* Ajustes del menú */
-.menu-item {
-    background-color: #07af9c;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 5px;
-}
-
-.menu-item:hover {
-    background-color: #e0e0e0;
-}
-
-.menu-link {
-    color: #333;
-}
-
-.menu-link:hover {
-    color: #666;
-}
-
-.menu-item.active {
-    background-color: #e0e0e0;
-    border-color: #30d0bd;
-    color: #666;
-}
 
 
-/* Ajustes del sub-menú */
 
-.submenu {
-    display: none;
-}
-.submenu-item {
-    display: block;
-    padding: 8px 16px;
-    color: #333;
-    text-decoration: none;
-}
-.submenu-item:hover {
-    background-color: #07af9c;
-    color: #666;
-    text-decoration: none; 
-}
 
-#submenu-licitaciones.active .submenu {
-    display: block;
-}
+

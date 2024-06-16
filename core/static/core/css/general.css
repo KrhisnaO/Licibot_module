@@ -21,6 +21,12 @@ body {
     color: #ffffff;
 }
 
+
+/*fondo de color*/
+#fondocol{
+    background: linear-gradient(to right, #443880, #e02030);
+}
+
 /*NAVBAR*/
 #navbar{
     font-weight: bold;
@@ -129,8 +135,20 @@ body {
     color: #a7a7a7; /* Color del texto al pasar el ratón */
 
 }
-/**/
-/**/
+
+
+/*INGRESO*/
+
+#ingresocard{
+    background-color: rgba(0, 0, 0, 0);/*Fondo traslucido para que se vea bien*/
+
+}
+
+
+/*CREAR USUARIO*/
+.card-body{
+    text-align: justify;
+}
 /**/
 /**/
 /**/
