@@ -1,0 +1,23 @@
+{% extends 'core/administrador.html' %}
+
+{% block admin_content %}
+
+<div id="crearusu" class="card-body col-md-6">
+    <h3 id="coltit">Editar Usuario</h3>
+    {% if messages %}
+        <ul id="tabmensaj" class="messages">
+            {% for message in messages %}
+                <li id="mensaj" class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <form id="form1" method="POST" action="" enctype="multipart/form-data" id="editar_usuario">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div id="iddivboton" class="text-center mt-3">
+            <input id="idboton" type="submit" class="btn btn-danger" value="Actualizar Usuario">
+        </div>
+    </form>
+</div>
+
+{% endblock %}

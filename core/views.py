@@ -1,12 +1,10 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from .models import CustomUser, Licitacion, Preguntasbbdd, Respuesta, ErrorHistory
-from .forms import LoginForm, CreateUserForm, LicitacionForm, PreguntasForm, SubirArchivoForm
+from .forms import LoginForm, CreateUserForm, LicitacionForm, PreguntasForm, SubirArchivoForm, CustomPasswordResetForm
 import requests
-
-from django.core.exceptions import ObjectDoesNotExist
 
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -46,6 +44,27 @@ def login_view(request):
         form = LoginForm()
     return render(request, 'core/ingreso.html', {'form': form})
 
+## CAMBIAR CONTRASEÑA ###
+
+def recuperar_pass(request):
+    if request.method == 'POST':
+        form = CustomPasswordResetForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            new_password = form.cleaned_data['new_password']
+
+            User = get_user_model()
+            user = User.objects.get(email=email)
+
+            user.set_password(new_password)
+            user.save()
+            return redirect('ingreso') 
+    else:
+        form = CustomPasswordResetForm()
+
+    return render(request, 'core/recuperar_pass.html', {'form': form})
+
+
 # CREADOR DE USUARIOS #
 @login_required
 
@@ -59,7 +78,7 @@ def crear_usuario(request):
             else:
                 user = form.save()
                 messages.success(request, 'El usuario se ha creado correctamente.')
-                return redirect('crear_usuario')  # Redirige a la misma página para limpiar el formulario
+                return redirect('crear_usuario') 
     else:
         form = CreateUserForm()
 
@@ -79,6 +98,24 @@ def historial_usu(request):
     storage.used = False
 
     return render(request, 'core/historial_usu.html', {'usuarios': usuarios})
+
+@login_required
+def editar_usuario(request, user_id):
+    usuario = get_object_or_404(CustomUser, id=user_id)
+    
+    if request.method == 'POST':
+        form = CreateUserForm(request.POST, instance=usuario)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Se ha actualizado la información exitosamente.')
+            return redirect('historial_usu')
+    else:
+        form = CreateUserForm(instance=usuario)
+    # Limpiar los mensajes después de recuperarlos
+    storage = messages.get_messages(request)
+    storage.used = False
+    
+    return render(request, 'core/editar_usuario.html', {'form': form})
 
 # CERRAR SESION ##
 @login_required
