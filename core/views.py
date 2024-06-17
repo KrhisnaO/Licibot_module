@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from .models import CustomUser, Licitacion, Preguntasbbdd, Respuesta, ErrorHistory
 from .forms import LoginForm, CreateUserForm, LicitacionForm, PreguntasForm, SubirArchivoForm, CustomPasswordResetForm
 import requests
-
+from django.db.models import Q
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 
@@ -17,7 +17,9 @@ from .utils import obtener_licitaciones, subir_chatpdf, preguntar_chatpdf
 def home(request):
     lici_count = Licitacion.objects.count()
     preg_count = Preguntasbbdd.objects.count()
-    return render(request, 'core/home.html', {'lici_count': lici_count, 'preg_count': preg_count})
+    nolici_count = Licitacion.objects.filter(archivoLicitacion__isnull=True).count() + Licitacion.objects.filter(archivoLicitacion="").count()
+    licidoc_count = Licitacion.objects.filter(~Q(archivoLicitacion__isnull=True) & ~Q(archivoLicitacion="")).count()
+    return render(request, 'core/home.html', {'lici_count': lici_count, 'preg_count': preg_count, 'nolici_count':nolici_count, 'licidoc_count':licidoc_count})
 
 ##### INGRESO DE SESION ###################################################
 def login_view(request):
@@ -374,3 +376,4 @@ def historial_errores(request):
     errores = ErrorHistory.objects.all().order_by('-fecha')
     return render(request, 'core/historial_errores.html', {'errores': errores})
 
+### CONTEO LICITACIONES SIN ARCHIVO ###
