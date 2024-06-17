@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block stylesheet %}
-<link rel="stylesheet" href="{% static 'core/css/menu.css' %}">
 {% endblock %}
 
 {% block custom_script %}
@@ -14,10 +13,10 @@
 <br>
 <br>
 <div class="container">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="list-group">
-                <a href="{% url 'crear_usuario' %}" class="fa fa-user list-group-item list-group-item-action menu-item"> 
+    <div class="row ">
+        <div class="col-md-3 ">
+            <div class="list-group ">
+                <a href="{% url 'crear_usuario' %}" class="fa fa-user list-group-item list-group-item-action menu-item "> 
                     <span>Crear Usuario</span>
                 </a>
 
@@ -42,8 +41,9 @@
                 </a>
             </div>
         </div>
-        <div class="col-md-9">
-            {% block admin_content %}{% endblock %}
+        <div class="col-md-9" >
+            {% block admin_content %}
+            {% endblock %}
         </div>
     </div>
 </div>

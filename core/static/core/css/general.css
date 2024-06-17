@@ -16,11 +16,19 @@ body {
     color: #000000;
 }
 
+#coltit2{
+    color: #000000;
+    text-align: left;
+}
+
 /*color blanco en caso de que se quiera dejar algo blanco*/
 #colblanc{
     color: #ffffff;
 }
 
+#colormor{
+    color: #443880;
+}
 
 /*fondo de color*/
 #fondocol{
