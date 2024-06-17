@@ -64,3 +64,8 @@ class ErrorHistory(models.Model):
 
     def __str__(self):
         return f"{self.tipo_vista} - {self.fecha}"
+
+    class Meta:
+        verbose_name = "Historial de Errores"
+        verbose_name_plural = "Historial de Errores"
+        ordering = ['-fecha']

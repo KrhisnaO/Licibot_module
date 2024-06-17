@@ -2,6 +2,9 @@
 
 {% block admin_content %}
     <h3 id="coltit">Historial de Usuarios</h3>
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'desc_user_excel' %}" id="idboton" class="btn btn-danger">Descargar Excel</a>
+    </div>
     <table id="tabladate" class="table table-bordered">
         <thead>
             <tr>
@@ -10,6 +13,7 @@
                 <th>Apellido</th>
                 <th>Email</th>
                 <th>Tipo de Usuario</th>
+                <th>Estado</th> 
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -32,7 +36,14 @@
                     {% endfor %}
                 </td>
                 <td>
-                    <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-primary btn-sm">Editar</a> <!-- Botón de editar -->
+                    {% if usuario.is_active %}
+                        Activo
+                    {% else %}
+                        Inactivo
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-primary btn-sm">Editar</a> 
                 </td>
             </tr>
             {% endfor %}

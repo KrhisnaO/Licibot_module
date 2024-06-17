@@ -52,7 +52,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'core.middleware.ErrorLoggingMiddleware',
 ]
+
+
 
 ROOT_URLCONF = 'Licibot.urls'
 

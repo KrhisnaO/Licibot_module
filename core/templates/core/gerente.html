@@ -1,6 +1,15 @@
-{% extends 'core/base.html' %}
+{% extends 'core/administrador.html' %}
 
 {% block content %}
-<h2>Gerente</h2>
-<!-- Contenido específico para la página de gerente -->
+<h2 id="coltit" class="text-center">Menú Gerente</h2>
+<br>
+<br>
+<div class="list-group-item list-group-item-action menu-item" id="submenu-licitaciones">
+    <span class="fa fa-gavel"> Mantenedor de Licitaciones</span>
+    <div class="submenu">
+        <a href="{% url 'buscar_lici' %}" class="submenu-item">Buscar Licitaciones</a>
+        <a href="{% url 'historial_lici' %}" class="submenu-item">Historial de Licitaciones</a>
+        <a href="{% url 'subir_archivo'  %}" class="submenu-item">Subir archivos</a>
+    </div>
+</div>
 {% endblock %}

@@ -11,6 +11,12 @@ from django.core.files.base import ContentFile
 
 from .utils import obtener_licitaciones, subir_chatpdf, preguntar_chatpdf
 
+## MANEJO DE ERRORES EN EL SISTEMA ##
+from .middleware import ErrorLoggingMiddleware
+
+## EXCEL ##
+from django.http import HttpResponse
+from openpyxl import Workbook
 
 # Create your views here.
 
@@ -29,16 +35,20 @@ def login_view(request):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user = authenticate(request, username=username, password=password)
-            if user is not None and user.is_active:
-                login(request, user)
-                if user.is_superuser:
-                    return redirect('crear_usuario')
-                elif user.groups.filter(name='VENDEDOR').exists():
-                    return redirect('vendedor')
-                elif user.groups.filter(name='GERENTE').exists():
-                    return redirect('gerente')
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    if user.is_superuser:
+                        return redirect('crear_usuario')
+                    elif user.groups.filter(name='VENDEDOR').exists():
+                        return redirect('vendedor')
+                    elif user.groups.filter(name='GERENTE').exists():
+                        return redirect('gerente')
+                    else:
+                        return redirect('home')
                 else:
-                    return redirect('home')
+                    mesg = "Usuario deshabilitado, en caso de error contactarse con el administrador."
+                    return render(request, 'core/ingreso.html', {'form': form, 'mesg': mesg})
             else:
                 mesg = "Usuario o contraseña incorrectos."
                 return render(request, 'core/ingreso.html', {'form': form, 'mesg': mesg})
@@ -69,7 +79,6 @@ def recuperar_pass(request):
 
 # CREADOR DE USUARIOS #
 @login_required
-
 def crear_usuario(request):
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
@@ -360,7 +369,7 @@ def seleccionar_preguntas(request, licitacion_id):
     return render(request, 'core/filtro_pregun.html', {'preguntas': preguntas, 'licitacion': licitacion})
 
 
-
+#################################################################
 ### HISTORIAL DE ERRORES ##
 @login_required
 def registrar_error(request, tipo_vista, descripcion):
@@ -376,4 +385,36 @@ def historial_errores(request):
     errores = ErrorHistory.objects.all().order_by('-fecha')
     return render(request, 'core/historial_errores.html', {'errores': errores})
 
-### CONTEO LICITACIONES SIN ARCHIVO ###
+###################################################################
+
+
+
+## DESCARGA DE ARCHIVOS EXCEL ##
+def desc_user_excel(request):
+    usuarios = CustomUser.objects.all()
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'Usuarios' 
+
+    headers = ['RUT', 'Nombre', 'Apellido', 'Correo electrónico', 'Tipo de Usuario', 'Estado']
+
+    for col_num, header in enumerate(headers, start=1):
+        ws.cell(row=1, column=col_num, value=header)
+
+    for row_num, usuario in enumerate(usuarios, start=2):
+        ws.cell(row=row_num, column=1, value=usuario.rut)
+        ws.cell(row=row_num, column=2, value=usuario.first_name)
+        ws.cell(row=row_num, column=3, value=usuario.last_name)
+        ws.cell(row=row_num, column=4, value=usuario.email)
+        tipo_usuario = next((group.name for group in usuario.groups.all()), 'Otro')
+        ws.cell(row=row_num, column=5, value=tipo_usuario)
+        estado_usuario = 'Activo' if usuario.is_active else 'Inactivo'
+        ws.cell(row=row_num, column=6, value=estado_usuario)
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=usuarios.xlsx'
+
+    wb.save(response)
+
+    return response

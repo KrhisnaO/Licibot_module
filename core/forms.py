@@ -21,7 +21,7 @@ class CustomPasswordResetForm(forms.Form):
             raise forms.ValidationError("No hay ninguna cuenta asociada a este correo electrónico.")
         return email
     
-########################################   
+########################################  
     
 class LicitacionForm(forms.ModelForm):
     class Meta:
@@ -50,10 +50,11 @@ class PreguntasForm(forms.ModelForm):
 class CreateUserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(), label='Contraseña')
     group = forms.ModelChoiceField(queryset=Group.objects.all(), empty_label=None, label='Rol')
+    is_active = forms.BooleanField(label='Activo', required=False)
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'password', 'first_name', 'last_name', 'rut', 'group']
+        fields = ['email', 'password', 'first_name', 'last_name', 'rut', 'group', 'is_active']
         labels = {
             'email': 'Correo electrónico',
             'password': 'Contraseña',
@@ -70,9 +71,10 @@ class CreateUserForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        if self.cleaned_data['password']:  # Verifica si se proporcionó una nueva contraseña
+        user.username = self.cleaned_data['email']
+        if self.cleaned_data['password']:
             user.set_password(self.cleaned_data['password'])
         if commit:
             user.save()
-            user.groups.set([self.cleaned_data['group']])  # Establece el grupo del usuario
+            user.groups.set([self.cleaned_data['group']])
         return user

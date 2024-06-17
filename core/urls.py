@@ -12,6 +12,7 @@ urlpatterns = [
     path('crear_usuario/', views.crear_usuario, name='crear_usuario'),
     path('historial_usu/', views.historial_usu, name='historial_usu'),
     path('editar_usuario/<int:user_id>/', views.editar_usuario, name='editar_usuario'),
+    path('desc_user_excel/', views.desc_user_excel, name='desc_user_excel'),
     path('vendedor/', views.vendedor, name='vendedor'),
     path('gerente/', views.gerente, name='gerente'),
     path('buscar_lici/', views.buscar_lici, name='buscar_lici'),
