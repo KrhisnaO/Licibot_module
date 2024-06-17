@@ -41,6 +41,8 @@ class SubirArchivoForm(forms.ModelForm):
         self.fields['nombreLicitacion'] = forms.CharField(initial=self.instance.nombreLicitacion, required=False, widget=forms.TextInput(attrs={'readonly': 'readonly', 'class': 'form-control'}))
         self.fields['descripcionLicitacion'] = forms.CharField(initial=self.instance.descripcionLicitacion, required=False, widget=forms.Textarea(attrs={'readonly': 'readonly', 'class': 'form-control', 'rows': 5}))
 
+### PREGUNTAS  ####
+
 class PreguntasForm(forms.ModelForm):
     class Meta:
         model = Preguntasbbdd

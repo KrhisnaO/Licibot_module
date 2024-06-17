@@ -62,7 +62,7 @@ ROOT_URLCONF = 'Licibot.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-         'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -108,10 +108,10 @@ REST_FRAMEWORK = {
 }
 
 
-# Indica a Django que use el modelo de usuario personalizado
+# Modelo de usuario personalizado
 AUTH_USER_MODEL = 'core.CustomUser'
 
-# Asegura que el backend de autenticación use el email
+# Autenticación con email
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )

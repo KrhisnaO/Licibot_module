@@ -386,10 +386,9 @@ def historial_errores(request):
     return render(request, 'core/historial_errores.html', {'errores': errores})
 
 ###################################################################
-
-
-
 ## DESCARGA DE ARCHIVOS EXCEL ##
+
+## ARCHIVO EXCEL HISTORIAL DE USUARIO ##
 def desc_user_excel(request):
     usuarios = CustomUser.objects.all()
 
@@ -418,3 +417,5 @@ def desc_user_excel(request):
     wb.save(response)
 
     return response
+
+## ARCHIVO EXCEL HISTORIAL DE LICITACIONES ##
