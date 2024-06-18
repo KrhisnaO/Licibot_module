@@ -20,12 +20,27 @@ from openpyxl import Workbook
 
 # Create your views here.
 
+
 def home(request):
     lici_count = Licitacion.objects.count()
     preg_count = Preguntasbbdd.objects.count()
-    nolici_count = Licitacion.objects.filter(archivoLicitacion__isnull=True).count() + Licitacion.objects.filter(archivoLicitacion="").count()
+    nolici_count = Licitacion.objects.filter(Q(archivoLicitacion__isnull=True) | Q(archivoLicitacion="")).count()
     licidoc_count = Licitacion.objects.filter(~Q(archivoLicitacion__isnull=True) & ~Q(archivoLicitacion="")).count()
-    return render(request, 'core/home.html', {'lici_count': lici_count, 'preg_count': preg_count, 'nolici_count':nolici_count, 'licidoc_count':licidoc_count})
+
+    # Verifica la pertenencia a grupos
+    is_vendedor = request.user.groups.filter(name='VENDEDOR').exists()
+    is_gerente = request.user.groups.filter(name='GERENTE').exists()
+
+    context = {
+        'lici_count': lici_count,
+        'preg_count': preg_count,
+        'nolici_count': nolici_count,
+        'licidoc_count': licidoc_count,
+        'is_vendedor': is_vendedor,
+        'is_gerente': is_gerente,
+    }
+
+    return render(request, 'core/home.html', context)
 
 ##### INGRESO DE SESION ###################################################
 def login_view(request):
@@ -39,11 +54,11 @@ def login_view(request):
                 if user.is_active:
                     login(request, user)
                     if user.is_superuser:
-                        return redirect('crear_usuario')
+                        return redirect('administrador')
                     elif user.groups.filter(name='VENDEDOR').exists():
-                        return redirect('vendedor')
+                        return redirect('administrador')
                     elif user.groups.filter(name='GERENTE').exists():
-                        return redirect('gerente')
+                        return redirect('administrador')
                     else:
                         return redirect('home')
                 else:
@@ -55,6 +70,7 @@ def login_view(request):
     else:
         form = LoginForm()
     return render(request, 'core/ingreso.html', {'form': form})
+
 
 ## CAMBIAR CONTRASEÑA ###
 

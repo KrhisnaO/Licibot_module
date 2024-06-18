@@ -24,9 +24,19 @@
                 {% if user.is_authenticated %}
                     <!-- Opción de Administración solo si el usuario ha iniciado sesión -->
                     {% if request.path == '/' %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'crear_usuario' %}" style="font-size: 1.2em;">Administración</a>
-                        </li>
+                        {% if is_vendedor %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'administrador' %}" style="font-size: 1.2em;">Vendedor</a>
+                            </li>
+                        {% elif is_gerente %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'administrador' %}" style="font-size: 1.2em;">Gerente</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'administrador' %}" style="font-size: 1.2em;">Administración</a>
+                            </li>
+                        {% endif %}
                     {% endif %}
                     <li class="nav-item">
                         <span id="saludo" class="nav-link disabled" style="font-size: 1.2em;">Hola, {{ user.first_name }}</span>
