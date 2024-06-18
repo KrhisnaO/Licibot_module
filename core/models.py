@@ -1,35 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
-# Create your models here.
-
-class Licitacion(models.Model):
-    idLicitacion = models.CharField(max_length=20, primary_key=True, verbose_name="Id de licitación")
-    nombreLicitacion = models.CharField(max_length=200, blank=False, null=False, verbose_name="Nombre de la licitación")
-    descripcionLicitacion = models.TextField(max_length=5000, null=True, blank=True, verbose_name="Descripción de la licitación")
-    archivoLicitacion = models.FileField(upload_to="licitacion/", null=True, blank=True, verbose_name="Archivo de la licitación")
-
-    def __str__(self):
-        return self.nombreLicitacion
-
-
-# PREGUNTAS LICIBOT #
-class Preguntasbbdd(models.Model):
-    idPreguntas = models.AutoField(primary_key=True, verbose_name="Id de pregunta")
-    nombrePregunta = models.CharField(max_length=80, blank=False, null=False, verbose_name="Texto de la pregunta")
-
-    def __str__(self):
-        return self.nombrePregunta
-    
-# RESPUESTAS CHATPDF #
-class Respuesta(models.Model):
-    licitacion = models.ForeignKey(Licitacion, on_delete=models.CASCADE, verbose_name="Licitación")
-    pregunta = models.ForeignKey(Preguntasbbdd, on_delete=models.CASCADE, verbose_name="Pregunta")
-    textoRespuesta = models.TextField(verbose_name="Texto de la respuesta")
-
-    def __str__(self):
-        return f"Respuesta a {self.pregunta.nombrePregunta} de la licitación {self.licitacion.nombreLicitacion}"
-    
 # USUARIOS #
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
@@ -54,9 +25,42 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
     
+## LICITACIONES ##
+class Licitacion(models.Model):
+    idLicitacion = models.CharField(max_length=20, primary_key=True, verbose_name="ID de licitación")
+    nombreLicitacion = models.CharField(max_length=200, blank=False, null=False, verbose_name="Nombre de la licitación")
+    descripcionLicitacion = models.TextField(max_length=5000, null=True, blank=True, verbose_name="Descripción de la licitación")
+    archivoLicitacion = models.FileField(upload_to="licitacion/", null=True, blank=True, verbose_name="Archivo de la licitación")
+    fechaCierre = models.DateTimeField(null=True, blank=True, verbose_name="Fecha de cierre")
+    estado = models.CharField(max_length=50, null=True, blank=True, verbose_name="Estado")
+    nombreOrganismo = models.CharField(max_length=200, null=True, blank=True, verbose_name="Nombre del organismo")
+    diasCierreLicitacion = models.IntegerField(null=True, blank=True) 
+    fecha_creacion = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    subido_por = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True, related_name='licitaciones_subidas')
 
-# HISTORIAL ERRORES #
+    def __str__(self):
+        return self.nombreLicitacion
+
+
+# PREGUNTAS LICIBOT #
+class Preguntasbbdd(models.Model):
+    idPreguntas = models.AutoField(primary_key=True, verbose_name="Id de pregunta")
+    nombrePregunta = models.CharField(max_length=80, blank=False, null=False, verbose_name="Texto de la pregunta")
+
+    def __str__(self):
+        return self.nombrePregunta
     
+# RESPUESTAS CHATPDF #
+class Respuesta(models.Model):
+    licitacion = models.ForeignKey(Licitacion, on_delete=models.CASCADE, verbose_name="Licitación")
+    pregunta = models.ForeignKey(Preguntasbbdd, on_delete=models.CASCADE, verbose_name="Pregunta")
+    textoRespuesta = models.TextField(verbose_name="Texto de la respuesta")
+
+    def __str__(self):
+        return f"Respuesta a {self.pregunta.nombrePregunta} de la licitación {self.licitacion.nombreLicitacion}"
+        
+
+# HISTORIAL ERRORES #  
 class ErrorHistory(models.Model):
     tipo_vista = models.CharField(max_length=200, verbose_name="Tipo de Vista")
     descripcion = models.TextField(verbose_name="Descripción del Error")

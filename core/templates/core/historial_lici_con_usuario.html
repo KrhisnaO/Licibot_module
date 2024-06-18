@@ -1,0 +1,26 @@
+{% extends 'core/administrador.html' %}
+
+{% block admin_content %}
+    <h3 id="coltit">Historial de Licitaciones con Usuario</h3>
+    
+    <table id="tabladate" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>ID de Licitación</th>
+                <th>Nombre de Licitación</th>
+                <th>Fecha de Creación</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for licit in licitaciones_guardadas %}
+            <tr>
+                <td>{{ licit.subido_por.first_name }} {{ licit.subido_por.last_name }}</td>
+                <td>{{ licit.idLicitacion }}</td>
+                <td>{{ licit.nombreLicitacion }}</td>
+                <td>{{ licit.fecha_creacion }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

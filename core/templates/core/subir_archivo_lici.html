@@ -1,0 +1,30 @@
+{% extends 'core/administrador.html' %}
+
+{% block admin_content %}
+    <h3>Subir Archivo de Licitación</h3>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="idLicitacion" class="form-label">ID de Licitación:</label>
+            <input type="text" id="idLicitacion" name="idLicitacion" class="form-control" value="{{ id_licitacion }}" readonly>
+        </div>
+        <div class="mb-3">
+            <label for="nombreLicitacion" class="form-label">Nombre de Licitación:</label>
+            <input type="text" id="nombreLicitacion" name="nombreLicitacion" class="form-control" value="{{ form.instance.nombreLicitacion }}" readonly>
+        </div>
+        
+        <div class="mb-3">
+            <label for="archivoLicitacion" class="form-label">Archivo de Licitación (solo PDF):</label>
+            <input type="file" id="archivoLicitacion" name="archivoLicitacion" class="form-control" accept=".pdf">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Subir Archivo</button>
+    </form>
+{% endblock %}

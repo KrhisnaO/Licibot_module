@@ -27,11 +27,13 @@
                 <div class="list-group-item list-group-item-action menu-item" id="submenu-licitaciones">
                     <span class="fa fa-gavel"> Mantenedor de Licitaciones</span>
                     <div class="submenu">
-                        <a href="{% url 'buscar_lici' %}" class="submenu-item">Buscar Licitaciones</a>
-                        <a href="{% url 'historial_lici' %}" class="submenu-item">Historial de Licitaciones</a>
-                        <a href="{% url 'subir_archivo'  %}" class="submenu-item">Subir archivos</a>
+                        <a href="{% url 'validar_licitacion' %}" class="submenu-item">Buscar </a>
+                        <a href="{% url 'historial_lici' %}" class="submenu-item">Historial</a>
                     </div>
                 </div>
+                <a href="{% url 'historial_lici_con_usuario' %}" class="fa fa-list list-group-item list-group-item-action menu-item">
+                    <span class="menu-link ist-group-item-action">Historial de Licitaciones con Usuario</span>
+                </a>
 
                 <a href="{% url 'mantenedor_preguntas' action='ins' id=-1 %}" class="fa fa-question-circle list-group-item list-group-item-action menu-item">
                     <span class="menu-link">Mantenedor de preguntas</span>

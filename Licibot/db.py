@@ -2,7 +2,7 @@ MYSQL = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'licibot',
-        'USER': 'licibotuser',
+        'USER': 'licibotuse',
         'PASSWORD': 'Licibot_2.0',
         'HOST': 'localhost',
         'PORT': '3306',
@@ -16,8 +16,8 @@ MYSQL = {
 ## COMO CREE LA BBDD
 ## EN LA TERMINAL 
 #CREATE DATABASE licibot;
-#CREATE USER 'licibotuser'@'localhost' IDENTIFIED BY 'Licibot_2.0';
-#GRANT ALL PRIVILEGES ON licibot.* TO 'licibotus'@'localhost';
+#CREATE USER 'licibotuse'@'localhost' IDENTIFIED BY 'Licibot_2.0';
+#GRANT ALL PRIVILEGES ON licibot.* TO 'licibotuse'@'localhost';
 #FLUSH PRIVILEGES;
 
 ### CONEXION BBDD PROYECTO  ##

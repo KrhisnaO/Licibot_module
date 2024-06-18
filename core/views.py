@@ -3,12 +3,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from .models import CustomUser, Licitacion, Preguntasbbdd, Respuesta, ErrorHistory
-from .forms import LoginForm, CreateUserForm, LicitacionForm, PreguntasForm, SubirArchivoForm, CustomPasswordResetForm
+from .forms import LoginForm, CreateUserForm, LicitacionForm, PreguntasForm, SubirArchivoForm, CustomPasswordResetForm, ValidarIDLicitacionForm
 import requests
 from django.db.models import Q
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 
+
+## MANEJO DE APIS ##
 from .utils import obtener_licitaciones, subir_chatpdf, preguntar_chatpdf
 
 ## MANEJO DE ERRORES EN EL SISTEMA ##
@@ -17,9 +17,10 @@ from .middleware import ErrorLoggingMiddleware
 ## EXCEL ##
 from django.http import HttpResponse
 from openpyxl import Workbook
+from openpyxl.chart import PieChart, Reference
+from openpyxl.chart.label import DataLabelList
 
-# Create your views here.
-
+## PAGINA HOME ##########################################################
 def home(request):
     lici_count = Licitacion.objects.count()
     preg_count = Preguntasbbdd.objects.count()
@@ -56,8 +57,7 @@ def login_view(request):
         form = LoginForm()
     return render(request, 'core/ingreso.html', {'form': form})
 
-## CAMBIAR CONTRASEÑA ###
-
+## CAMBIAR CONTRASEÑA ##################################################
 def recuperar_pass(request):
     if request.method == 'POST':
         form = CustomPasswordResetForm(request.POST)
@@ -77,7 +77,7 @@ def recuperar_pass(request):
     return render(request, 'core/recuperar_pass.html', {'form': form})
 
 
-# CREADOR DE USUARIOS #
+## CREADOR DE USUARIOS ###############################################################
 @login_required
 def crear_usuario(request):
     if request.method == 'POST':
@@ -99,7 +99,7 @@ def crear_usuario(request):
 
     return render(request, 'core/crear_usuario.html', {'form': form})
 
-# HISTORIAL DE USUARIO #
+## HISTORIAL DE USUARIO #########################################################
 @login_required
 def historial_usu(request):
     usuarios = CustomUser.objects.all()
@@ -110,6 +110,7 @@ def historial_usu(request):
 
     return render(request, 'core/historial_usu.html', {'usuarios': usuarios})
 
+#### EDITAR USUARIO ################################################################
 @login_required
 def editar_usuario(request, user_id):
     usuario = get_object_or_404(CustomUser, id=user_id)
@@ -128,26 +129,33 @@ def editar_usuario(request, user_id):
     
     return render(request, 'core/editar_usuario.html', {'form': form})
 
-# CERRAR SESION ##
+# CERRAR SESION ######################################################################
 @login_required
 def cerrar_sesion(request):
     logout(request)
     return redirect('home')
 
-# LOGIN ADMINISTRADR #
+# LOGIN ADMINISTRADR ################################################################
 @login_required
 def administrador(request):
     return render(request, 'core/administrador.html')
 
-# LOGIN VENDEDOR #
+# LOGIN VENDEDOR ####################################################################
 @login_required
 def vendedor(request):
     return render(request, 'core/vendedor.html')
 
-# LOGIN GERENTE #
+# LOGIN GERENTE ####################################################################
 @login_required
 def gerente(request):
     return render(request, 'core/gerente.html')
+
+# VISTA DE GERENTE HISTORIAL CON USUARIOS ############################################
+@login_required
+def historial_lici_con_usuario(request):
+    licitaciones_guardadas = Licitacion.objects.select_related('subido_por').all()
+
+    return render(request, 'core/historial_lici_con_usuario.html', {'licitaciones_guardadas': licitaciones_guardadas})
 
 
 #### MANTENEDOR DE PREGUNTAS #############################################
@@ -208,49 +216,102 @@ def mantenedor_preguntas(request, action, id):
     storage.used = False
     return render(request, "core/mantenedor_preguntas.html", data)
 
+##############################################################################################
+##############################################################################################
+## COMIENZO LICITACIONES ####
 
-# BUSCAR LICITACIONES #
+## VALIDAR ID LICITACION ###
 @login_required
-def buscar_lici(request):
-    filtro_id = request.GET.get('id', None)
-    filtro_palabra_clave = request.GET.get('palabra_clave', None)
-    
-    licitaciones = None
-    if filtro_id or filtro_palabra_clave:
-        licitaciones = obtener_licitaciones(filtro_id=filtro_id, filtro_palabra_clave=filtro_palabra_clave)
-    
-    if licitaciones is not None:
-        if request.method == 'POST':
-            # Procesar el formulario de guardado
-            id_licitacion = request.POST.get('id_licitacion')
-            nombre_licitacion = request.POST.get('nombre_licitacion')
-            descripcion_licitacion = request.POST.get('descripcion_licitacion')
+def validar_licitacion(request):
+    if request.method == 'POST':
+        form = ValidarIDLicitacionForm(request.POST)
+        if form.is_valid():
+            id_licitacion = form.cleaned_data['idLicitacion']
+            licitaciones = obtener_licitaciones(filtro_id=id_licitacion)
             
-            # Verificar si la licitación ya existe en la base de datos
-            if not Licitacion.objects.filter(idLicitacion=id_licitacion).exists():
-                Licitacion.objects.create(
-                    idLicitacion=id_licitacion,
-                    nombreLicitacion=nombre_licitacion,
-                    descripcionLicitacion=descripcion_licitacion
+            if licitaciones:
+                licitacion_data = licitaciones[0]
+                licitacion, created = Licitacion.objects.update_or_create(
+                    idLicitacion=licitacion_data['CodigoExterno'],
+                    defaults={
+                        'nombreLicitacion': licitacion_data.get('Nombre', ''),
+                        'descripcionLicitacion': licitacion_data.get('Descripcion', ''),
+                        'fechaCierre': licitacion_data.get('FechaCierre', None),
+                        'estado': licitacion_data.get('Estado', ''),
+                        'nombreOrganismo': licitacion_data.get('NombreOrganismo', ''),
+                        'diasCierreLicitacion': licitacion_data.get('DiasCierreLicitacion', None)  
+                    }
                 )
-                messages.success(request, '¡La licitación ha sido guardada con éxito!')
-            else:
-                messages.warning(request, 'La licitación ya existe en la base de datos.')
-            return redirect('buscar_lici')
-        
-        return render(request, 'core/buscar_lici.html', {'licitaciones': licitaciones})
-    elif filtro_id or filtro_palabra_clave:
-        return render(request, 'core/buscar_lici.html', {'error_message': 'No se encontraron licitaciones con los criterios proporcionados.'})
-    else:
-        return render(request, 'core/buscar_lici.html')
+                
+                if created:
+                    messages.success(request, f'ID de Licitación {id_licitacion} válido. Ahora puede subir el archivo PDF.')
+                else:
+                    messages.info(request, f'ID de Licitación {id_licitacion} ya existe. Puede actualizar el archivo PDF.')
 
-# HISTORIAL LICITACIONES #
+                request.session['idLicitacion'] = id_licitacion
+                request.session['licitacion_validada'] = True
+                return redirect('subir_archivo_lici', id=id_licitacion)
+            else:
+                messages.error(request, f'ID de Licitación {id_licitacion} no encontrado en Mercado Público. Por favor, verifique el ID.')
+                request.session['licitacion_validada'] = False
+        else:
+            messages.error(request, 'Error en el formulario. Por favor, revise los datos ingresados.')
+            request.session['licitacion_validada'] = False
+    else:
+        form = ValidarIDLicitacionForm()
+        request.session['licitacion_validada'] = False
+
+    return render(request, 'core/validar_licitacion.html', {'form': form})
+
+
+
+## SUBIR ARCHIVO LICITACION ###
+@login_required
+def subir_archivo_lici(request, id):
+    id_licitacion = id
+    
+    if not id_licitacion:
+        messages.error(request, 'Por favor, proporcione un ID de Licitación válido.')
+        return redirect('validar_licitacion')
+
+    licitacion = Licitacion.objects.filter(idLicitacion=id_licitacion).first()
+
+    if request.method == 'POST':
+        form = SubirArchivoForm(request.POST, request.FILES, instance=licitacion)
+
+        if form.is_valid():
+            licitacion = form.save(commit=False)
+            licitacion.subido_por = request.user 
+            licitacion.save()
+            
+            messages.success(request, '¡Archivo de licitación guardado correctamente!')
+            return redirect('validar_licitacion')
+        else:
+            messages.error(request, 'Error al guardar el archivo de licitación. Asegúrese de que el archivo sea un PDF.')
+    else:
+        form = SubirArchivoForm(instance=licitacion)
+
+    return render(request, 'core/subir_archivo_lici.html', {'form': form, 'id_licitacion': id_licitacion})
+
+
+# HISTORIAL LICITACIONES ##################################
 @login_required
 def historial_lici(request):
-    licitaciones_guardadas = Licitacion.objects.all()
-    return render(request, 'core/historial_lici.html', {'licitaciones_guardadas': licitaciones_guardadas})
+    licitaciones = Licitacion.objects.all()
+    return render(request, 'core/historial_lici.html', {'licitaciones': licitaciones})
 
-###################################################################
+
+
+
+
+
+
+
+
+
+##########################################################################################
+"""
+
 # SUBIR ARCHIVO DE LICITACIONES #
 @login_required
 def subir_archivo(request):
@@ -330,9 +391,12 @@ def subir_archivo(request):
     else:
         form = SubirArchivoForm(instance=licitacion if licitacion else None)
 
-    return render(request, 'core/subir_archivo.html', {'form': form, 'licitacion': licitacion, 'id_encontrado': id_encontrado, 'error': error})
+    return render(request, 'core/subir_archivo.html', {'form': form, 'licitacion': licitacion, 'id_encontrado': id_encontrado, 'error': error}) """
 
-# LEER ARCHIVOS PDF CON SUS RESPECTIVAS RESPUESTAS #
+
+
+#######################################################################################
+# LEER ARCHIVOS PDF CON SUS RESPECTIVAS RESPUESTAS ###################
 def leer_pdf(request, id):
     licitacion = get_object_or_404(Licitacion, idLicitacion=id)
     preguntas = Preguntasbbdd.objects.all()
@@ -352,7 +416,7 @@ def leer_pdf(request, id):
         'preguntas_respuestas': preguntas_respuestas,
     })
 
-
+## SELECCION DE PREGUNTAS QUE SE LE HARAN AL ARCHIVO ###################
 @login_required
 def seleccionar_preguntas(request, licitacion_id):
     licitacion = get_object_or_404(Licitacion, idLicitacion=licitacion_id)
@@ -369,7 +433,8 @@ def seleccionar_preguntas(request, licitacion_id):
     return render(request, 'core/filtro_pregun.html', {'preguntas': preguntas, 'licitacion': licitacion})
 
 
-#################################################################
+#############################################################################
+#############################################################################
 ### HISTORIAL DE ERRORES ##
 @login_required
 def registrar_error(request, tipo_vista, descripcion):
@@ -385,7 +450,8 @@ def historial_errores(request):
     errores = ErrorHistory.objects.all().order_by('-fecha')
     return render(request, 'core/historial_errores.html', {'errores': errores})
 
-###################################################################
+############################################################################################
+############################################################################################
 ## DESCARGA DE ARCHIVOS EXCEL ##
 
 ## ARCHIVO EXCEL HISTORIAL DE USUARIO ##
@@ -419,3 +485,64 @@ def desc_user_excel(request):
     return response
 
 ## ARCHIVO EXCEL HISTORIAL DE LICITACIONES ##
+def desc_lici_excel(request):
+    licitaciones = Licitacion.objects.all()
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'Licitaciones' 
+
+    headers = ['ID de Licitación', 'Nombre de Licitación', 'Archivo de Licitación']
+
+    for col_num, header in enumerate(headers, start=1):
+        ws.cell(row=1, column=col_num, value=header)
+
+    total_licitaciones = 0
+    licitaciones_con_archivo = 0
+    licitaciones_sin_archivo = 0
+
+    for row_num, licitacion in enumerate(licitaciones, start=2):
+        total_licitaciones += 1
+        ws.cell(row=row_num, column=1, value=licitacion.idLicitacion)
+        ws.cell(row=row_num, column=2, value=licitacion.nombreLicitacion)
+        if licitacion.archivoLicitacion:
+            licitaciones_con_archivo += 1
+            ws.cell(row=row_num, column=4, value="Sí")
+        else:
+            licitaciones_sin_archivo += 1
+            ws.cell(row=row_num, column=4, value="No")
+
+    porcentaje_con_archivo = (licitaciones_con_archivo / total_licitaciones) * 100 if total_licitaciones > 0 else 0
+    porcentaje_sin_archivo = (licitaciones_sin_archivo / total_licitaciones) * 100 if total_licitaciones > 0 else 0
+
+    ws.cell(row=row_num + 2, column=1, value="Resumen de Licitaciones")
+    ws.cell(row=row_num + 3, column=1, value="Total de Licitaciones")
+    ws.cell(row=row_num + 3, column=2, value=total_licitaciones)
+    ws.cell(row=row_num + 4, column=1, value="Licitaciones con Archivo")
+    ws.cell(row=row_num + 4, column=2, value=licitaciones_con_archivo)
+    ws.cell(row=row_num + 4, column=3, value=f"{porcentaje_con_archivo:.2f}%")
+    ws.cell(row=row_num + 5, column=1, value="Licitaciones sin Archivo")
+    ws.cell(row=row_num + 5, column=2, value=licitaciones_sin_archivo)
+    ws.cell(row=row_num + 5, column=3, value=f"{porcentaje_sin_archivo:.2f}%")
+
+    chart = PieChart()
+    labels = Reference(ws, min_col=1, min_row=row_num + 3, max_row=row_num + 5)
+    data = Reference(ws, min_col=2, min_row=row_num + 3, max_row=row_num + 5)
+    chart.add_data(data, titles_from_data=True)
+    chart.set_categories(labels)
+    chart.title = "Estado de Licitaciones"
+    
+    data_labels = DataLabelList()
+    data_labels.showPercent = True 
+    data_labels.showVal = False  
+    chart.dataLabels = data_labels
+
+    ws.add_chart(chart, "E1")  
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=licitaciones.xlsx'
+
+    wb.save(response)
+
+    return response
+

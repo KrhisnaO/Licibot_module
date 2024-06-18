@@ -3,51 +3,6 @@ from .models import Licitacion, CustomUser, Preguntasbbdd
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 
-class LoginForm(forms.Form):
-    username = forms.CharField(widget=forms.TextInput(), label="Correo")
-    password = forms.CharField(widget=forms.PasswordInput(), label="Contraseña")
-
-## CAMBIO DE CONTRASEÑA ##
-class CustomPasswordResetForm(forms.Form):
-    email = forms.EmailField(label='Correo electrónico')
-    new_password = forms.CharField(label='Nueva contraseña', widget=forms.PasswordInput)
-
-    def clean_email(self):
-        email = self.cleaned_data['email']
-        User = get_user_model()
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            raise forms.ValidationError("No hay ninguna cuenta asociada a este correo electrónico.")
-        return email
-    
-########################################  
-    
-class LicitacionForm(forms.ModelForm):
-    class Meta:
-        model = Licitacion
-        fields = ['idLicitacion', 'nombreLicitacion', 'descripcionLicitacion', 'archivoLicitacion']
-    
-## SE AGREGA PARA CUANDO SE SUBA UN ARCHIVO NO SE SOBREESCRIBA EN LA BBDD
-class SubirArchivoForm(forms.ModelForm):
-    class Meta:
-        model = Licitacion
-        fields = ['archivoLicitacion']
-    
-    def __init__(self, *args, **kwargs):
-        super(SubirArchivoForm, self).__init__(*args, **kwargs)
-        # Campos de idLicitacion y nombreLicitacion solo lectura
-        self.fields['idLicitacion'] = forms.CharField(initial=self.instance.idLicitacion, required=False, widget=forms.TextInput(attrs={'readonly': 'readonly', 'class': 'form-control'}))
-        self.fields['nombreLicitacion'] = forms.CharField(initial=self.instance.nombreLicitacion, required=False, widget=forms.TextInput(attrs={'readonly': 'readonly', 'class': 'form-control'}))
-        self.fields['descripcionLicitacion'] = forms.CharField(initial=self.instance.descripcionLicitacion, required=False, widget=forms.Textarea(attrs={'readonly': 'readonly', 'class': 'form-control', 'rows': 5}))
-
-### PREGUNTAS  ####
-
-class PreguntasForm(forms.ModelForm):
-    class Meta:
-        model = Preguntasbbdd
-        fields = ['idPreguntas', 'nombrePregunta']
-
 # USUARIOS #
 class CreateUserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(), label='Contraseña')
@@ -80,3 +35,58 @@ class CreateUserForm(forms.ModelForm):
             user.save()
             user.groups.set([self.cleaned_data['group']])
         return user
+    
+### INGRESO ###
+
+class LoginForm(forms.Form):
+    username = forms.CharField(widget=forms.TextInput(), label="Correo")
+    password = forms.CharField(widget=forms.PasswordInput(), label="Contraseña")
+
+## CAMBIO DE CONTRASEÑA ##
+class CustomPasswordResetForm(forms.Form):
+    email = forms.EmailField(label='Correo electrónico')
+    new_password = forms.CharField(label='Nueva contraseña', widget=forms.PasswordInput)
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        User = get_user_model()
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise forms.ValidationError("No hay ninguna cuenta asociada a este correo electrónico.")
+        return email
+    
+########################################  
+ 
+# VALIDAR ID DE LICITACION ##
+class ValidarIDLicitacionForm(forms.Form):
+    idLicitacion = forms.CharField(label='ID de Licitación', max_length=20)
+
+class LicitacionForm(forms.ModelForm):
+    class Meta:
+        model = Licitacion
+        fields = ['nombreLicitacion', 'descripcionLicitacion', 'archivoLicitacion', 'fechaCierre', 'estado', 'nombreOrganismo', 'diasCierreLicitacion']
+    
+
+## SE AGREGA PARA CUANDO SE SUBA UN ARCHIVO NO SE SOBREESCRIBA EN LA BBDD
+class SubirArchivoForm(forms.ModelForm):
+    class Meta:
+        model = Licitacion
+        fields = ['archivoLicitacion']
+
+    def clean_archivoLicitacion(self):
+        archivo = self.cleaned_data['archivoLicitacion']
+        if archivo:
+            extension = archivo.name.split('.')[-1].lower()
+            if extension != 'pdf':
+                raise forms.ValidationError('El archivo debe ser un PDF.')
+        return archivo
+
+
+### PREGUNTAS  ####
+
+class PreguntasForm(forms.ModelForm):
+    class Meta:
+        model = Preguntasbbdd
+        fields = ['idPreguntas', 'nombrePregunta']
+

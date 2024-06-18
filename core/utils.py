@@ -1,42 +1,52 @@
 import requests
+from django.core.exceptions import ValidationError
 
 ## SE AGREGAN ACÁ LAS APIS PARA NO TENER QUE AGREGARLAS EN VIEWS #
 # YA QUE SE EXTENDERIAN MUCHO EL CODIGO DE LA MISMA #
 
 # Función para obtener licitaciones desde la API de Mercado Público con filtros
-def obtener_licitaciones(filtro_id=None, filtro_palabra_clave=None):
+def obtener_licitaciones(filtro_id=None):
     """
-    Obtiene licitaciones desde la API de Mercado Público con filtros opcionales por ID y palabra clave.
-    
-    :param filtro_id: ID de la licitación a buscar (opcional).
-    :param filtro_palabra_clave: Palabra clave para filtrar las licitaciones por nombre o descripción (opcional).
-    :return: Lista de licitaciones que cumplen con los filtros, o None si hay un error en la solicitud.
+    Obtiene licitaciones desde la API de Mercado Público.
+    :return: Lista de diccionarios con info de las licitaciones, o None si hay un error en la solicitud.
     """
-    ticket = "F8537A18-6766-4DEF-9E59-426B4FEE2844"
-    base_url = "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json"
-    
-    # Construcción de la URL con los filtros adecuados
+    ticket = "F8537A18-6766-4DEF-9E59-426B4FEE2844" ##TICKET API MERCADO PUBLICO
+    base_url = "https://api.mercadopublico.cl/servicios/v1/Publico/Licitaciones.json?"
+
     if filtro_id:
-        url_api = f"{base_url}?codigo={filtro_id}&estado=activas&ticket={ticket}"
+        url_api = f"{base_url}codigo={filtro_id}&ticket={ticket}"
     else:
-        url_api = f"{base_url}?ticket={ticket}&estado=activas"
-    
+        return None
+
     try:
         respuesta = requests.get(url_api)
-        respuesta.raise_for_status()  # Lanza una excepción para códigos de estado HTTP
+        respuesta.raise_for_status()
         
         datos = respuesta.json()
         listado = datos.get('Listado', [])
-        
-        if filtro_palabra_clave:
-            palabra_clave_upper = filtro_palabra_clave.upper()
-            listado = [
-                lic for lic in listado 
-                if palabra_clave_upper in lic.get('Nombre', '').upper() or 
-                   palabra_clave_upper in lic.get('Descripcion', '').upper()
-            ]
-        return listado
-    
+
+        licitaciones = []
+        for licitacion in listado:
+            fecha_cierre = licitacion.get('FechaCierre', None)
+            if fecha_cierre is None:
+                fechas = licitacion.get('Fechas', {})
+                fecha_cierre = fechas.get('FechaCierre', 'No encontrada')
+                
+            comprador = licitacion.get('Comprador', {})
+            nombre_organismo = comprador.get('NombreOrganismo', 'No encontrado')
+            
+            licitaciones.append({
+                'CodigoExterno': licitacion.get('CodigoExterno', ''),
+                'Nombre': licitacion.get('Nombre', ''),
+                'FechaCierre': fecha_cierre,
+                'Descripcion': licitacion.get('Descripcion', ''),
+                'Estado': licitacion.get('Estado', ''),
+                'NombreOrganismo': nombre_organismo,
+                'DiasCierreLicitacion': licitacion.get('DiasCierreLicitacion', None)
+            })
+
+        return licitaciones
+
     except requests.exceptions.RequestException as e:
         # Manejo de excepciones en caso de error en la solicitud
         print(f"Error al obtener las licitaciones: {e}")
