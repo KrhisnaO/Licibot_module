@@ -1,0 +1,49 @@
+{% extends 'core/administrador.html' %}
+
+{% block admin_content %}
+<h3>Información detallada de la Licitación {{ licitacion.idLicitacion }}</h3>
+
+<div class="card">
+    <div class="card-header">
+        Detalles de la Licitación
+    </div>
+    <div class="card-body">
+        <p><strong>ID de Licitación:</strong> {{ licitacion.idLicitacion }}</p>
+        <p><strong>Nombre de la Licitación:</strong> {{ licitacion.nombreLicitacion }}</p>
+        <p><strong>Descripción de la Licitación:</strong> {{ licitacion.descripcionLicitacion }}</p>
+        <p><strong>Fecha de Cierre:</strong> {{ licitacion.fechaCierre }}</p>
+        <p><strong>Estado:</strong> {{ licitacion.estado }}</p>
+        <p><strong>Nombre del Organismo:</strong> {{ licitacion.nombreOrganismo }}</p>
+        <p><strong>Días de Cierre de la Licitación:</strong> {{ licitacion.diasCierreLicitacion }}</p>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        Respuestas generadas por ChatPDF
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Pregunta</th>
+                    <th>Respuesta</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for respuesta in respuestas %}
+                <tr>
+                    <td>{{ respuesta.pregunta.nombrePregunta }}</td>
+                    <td>{{ respuesta.textoRespuesta }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2">No hay respuestas generadas por ChatPDF para esta licitación.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,5 +1,0 @@
-1° eliminar= home.css , menú.css .
-2° conectar mi general.css
--si ahí que poner ides específicos yo lo hago
--algún cambio que quieras me avisas
--yo cambio los colores de los botones y pongo las ides cuando subas tu version

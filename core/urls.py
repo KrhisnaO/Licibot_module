@@ -14,6 +14,8 @@ urlpatterns = [
     path('editar_usuario/<int:user_id>/', views.editar_usuario, name='editar_usuario'),
     path('desc_user_excel/', views.desc_user_excel, name='desc_user_excel'),
     path('desc_lici_excel/', views.desc_lici_excel, name='desc_lici_excel'),
+    path('vendedor/', views.vendedor, name='vendedor'),
+    path('gerente/', views.gerente, name='gerente'),
     path('historial_lici/', views.historial_lici, name='historial_lici'),
     path('historial_lici_con_usuario/', views.historial_lici_con_usuario, name='historial_lici_con_usuario'),
     path('subir_archivo_lici/<str:id>/', views.subir_archivo_lici, name='subir_archivo_lici'),
@@ -21,5 +23,7 @@ urlpatterns = [
     path('seleccionar_preguntas/<str:licitacion_id>/', views.seleccionar_preguntas, name='seleccionar_preguntas'),
     path('historial_errores/', views.historial_errores, name='historial_errores'),
     path('validar_licitacion/', views.validar_licitacion, name='validar_licitacion'),
+    path('ver_info_licitacion/<str:id>/', views.ver_info_licitacion, name='ver_info_licitacion'),
+    path('guardar_respuestas/<str:id>/', views.guardar_respuestas, name='guardar_respuestas'),
 ]
 

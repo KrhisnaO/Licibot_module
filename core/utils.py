@@ -1,10 +1,9 @@
 import requests
-from django.core.exceptions import ValidationError
+from .models import ErrorHistory
+import requests
 
 ## SE AGREGAN ACÁ LAS APIS PARA NO TENER QUE AGREGARLAS EN VIEWS #
 # YA QUE SE EXTENDERIAN MUCHO EL CODIGO DE LA MISMA #
-
-# Función para obtener licitaciones desde la API de Mercado Público con filtros
 def obtener_licitaciones(filtro_id=None):
     """
     Obtiene licitaciones desde la API de Mercado Público.
@@ -59,16 +58,9 @@ def obtener_licitaciones(filtro_id=None):
 # API_KEY = "sec_toBfXEfGs83YOLY2RTr63iBC9jtiZGfg"
 
 # FUNCIÓN PARA LLAMAR API DE CHATPDF
-    
-# Función para subir un archivo PDF a ChatPDF y obtener el sourceId
 def subir_chatpdf(file_path):
-    """
-    Sube un archivo PDF a ChatPDF y obtiene el sourceId.
 
-    :param file_path: Ruta del archivo PDF a subir.
-    :return: sourceId del archivo subido, o None si hay un error en la solicitud.
-    """
-    api_key = 'sec_toBfXEfGs83YOLY2RTr63iBC9jtiZGfg'  # Utiliza la API_KEY correcta
+    api_key = 'sec_tK5rAXVkeTNOhFjQUfJNeLq0rMlyFkjy' 
     url = 'https://api.chatpdf.com/v1/sources/add-file'
     
     try:
@@ -82,22 +74,16 @@ def subir_chatpdf(file_path):
             return data.get('sourceId')
     
     except requests.exceptions.RequestException as e:
-        print(f"Error al subir el archivo PDF: {e}")
+        registrar_error('subir_chatpdf', str(e))
+        return None
+    except Exception as e:
+        registrar_error('subir_chatpdf', str(e))
         return None
 
-# Función para hacer una pregunta sobre un PDF subido a ChatPDF
 def preguntar_chatpdf(source_id, pregunta, id_only=False):
-    """
-    Hace una pregunta sobre un PDF subido a ChatPDF utilizando el sourceId.
-
-    :param source_id: ID del source del archivo PDF.
-    :param pregunta: Pregunta a realizar sobre el PDF.
-    :param id_only: Indicador para obtener solo el ID de la licitación.
-    :return: Respuesta de ChatPDF a la pregunta, o None si hay un error en la solicitud.
-    """
-    api_key = 'sec_toBfXEfGs83YOLY2RTr63iBC9jtiZGfg'  # Utiliza la API_KEY correcta
+    api_key = 'sec_tK5rAXVkeTNOhFjQUfJNeLq0rMlyFkjy'
     url = 'https://api.chatpdf.com/v1/chats/message'
-    
+
     content = pregunta
     if id_only:
         content = f"{pregunta} Por favor, responde solo con el ID de la licitación sin texto adicional."
@@ -108,7 +94,7 @@ def preguntar_chatpdf(source_id, pregunta, id_only=False):
             {"role": "user", "content": content}
         ]
     }
-    
+
     try:
         headers = {
             'x-api-key': api_key,
@@ -116,10 +102,30 @@ def preguntar_chatpdf(source_id, pregunta, id_only=False):
         }
         response = requests.post(url, headers=headers, json=question_data)
         response.raise_for_status()
-        
+
         data = response.json()
-        return data.get('content')
-    
+        if isinstance(data, dict) and 'content' in data:
+            return data['content']
+        else:
+            registrar_error('preguntar_chatpdf', f"Respuesta inesperada de la API: {data}")
+            return None
+
     except requests.exceptions.RequestException as e:
-        print(f"Error al hacer la pregunta: {e}")
+        registrar_error('preguntar_chatpdf', str(e))
         return None
+    except ValueError as e:
+        registrar_error('preguntar_chatpdf', str(e))
+        return None
+    except Exception as e:
+        registrar_error('preguntar_chatpdf', str(e))
+        return None
+
+
+def registrar_error(tipo_vista, descripcion):
+    try:
+        ErrorHistory.objects.create(
+            tipo_vista=tipo_vista,
+            descripcion=descripcion,
+        )
+    except Exception as e:
+        print(f"Error al registrar el error en el historial: {str(e)}")

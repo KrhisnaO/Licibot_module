@@ -1,11 +1,12 @@
 from django.contrib import admin
-from .models import Licitacion, Preguntasbbdd
+from .models import Licitacion, Preguntasbbdd, ErrorHistory
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import CustomUser
 
 # Register your models here.
 admin.site.register(Licitacion)
 admin.site.register(Preguntasbbdd)
+admin.site.register(ErrorHistory)
 
 
 class CustomUserAdmin(BaseUserAdmin):

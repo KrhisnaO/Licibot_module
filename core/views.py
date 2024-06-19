@@ -6,13 +6,16 @@ from .models import CustomUser, Licitacion, Preguntasbbdd, Respuesta, ErrorHisto
 from .forms import LoginForm, CreateUserForm, LicitacionForm, PreguntasForm, SubirArchivoForm, CustomPasswordResetForm, ValidarIDLicitacionForm
 import requests
 from django.db.models import Q
-
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 ## MANEJO DE APIS ##
 from .utils import obtener_licitaciones, subir_chatpdf, preguntar_chatpdf
 
 ## MANEJO DE ERRORES EN EL SISTEMA ##
 from .middleware import ErrorLoggingMiddleware
+from datetime import datetime
+import traceback
 
 ## EXCEL ##
 from django.http import HttpResponse
@@ -101,17 +104,25 @@ def crear_usuario(request):
         if form.is_valid():
             rut = form.cleaned_data['rut']
             if CustomUser.objects.filter(rut=rut).exists():
+                descripcion = f"Error al crear usuario: Ya existe un usuario con el RUT {rut}."
+                ErrorHistory.objects.create(
+                    tipo_vista='crear_usuario',
+                    descripcion=descripcion
+                )
                 messages.error(request, 'Ya existe un usuario con este RUT.')
             else:
                 user = form.save()
                 messages.success(request, 'El usuario se ha creado correctamente.')
-                return redirect('crear_usuario') 
+                return redirect('crear_usuario')
+        else:
+            descripcion = "Error al crear usuario: Datos inválidos en el formulario."
+            ErrorHistory.objects.create(
+                tipo_vista='crear_usuario',
+                descripcion=descripcion
+            )
+            messages.error(request, 'Hubo un problema al crear el usuario. Contacte al administrador.')
     else:
         form = CreateUserForm()
-
-    # Limpiar los mensajes después de recuperarlos
-    storage = messages.get_messages(request)
-    storage.used = False
 
     return render(request, 'core/crear_usuario.html', {'form': form})
 
@@ -126,19 +137,25 @@ def historial_usu(request):
 
     return render(request, 'core/historial_usu.html', {'usuarios': usuarios})
 
-#### EDITAR USUARIO ################################################################
-@login_required
+#### EDITAR USUARIO ################################################################@login_required
 def editar_usuario(request, user_id):
     usuario = get_object_or_404(CustomUser, id=user_id)
     
     if request.method == 'POST':
         form = CreateUserForm(request.POST, instance=usuario)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Se ha actualizado la información exitosamente.')
-            return redirect('historial_usu')
+            try:
+                form.save()
+                messages.success(request, 'Se ha actualizado la información exitosamente.')
+                return redirect('historial_usu')
+            except Exception as e:
+                tipo_vista = 'editar_usuario'
+                descripcion = f"Error al actualizar usuario (ID: {user_id}): {str(e)}"
+                registrar_error(request, tipo_vista, descripcion)
+                messages.error(request, 'Hubo un problema al actualizar la información del usuario. Contacte al administrador.')
     else:
         form = CreateUserForm(instance=usuario)
+
     # Limpiar los mensajes después de recuperarlos
     storage = messages.get_messages(request)
     storage.used = False
@@ -178,7 +195,6 @@ def mantenedor_preguntas(request, action, id):
                         form.save()
                         data["mesg"] = "¡La Pregunta fue creada correctamente!"
                     except Exception as e:
-                        # Registrar el error en el historial
                         registrar_error(request, 'mantenedor_preguntas', f"Error al crear pregunta: {str(e)}")
                         data["mesg"] = "¡No se pudo crear la pregunta!"
             else:
@@ -193,7 +209,6 @@ def mantenedor_preguntas(request, action, id):
                         form.save()
                         data["mesg"] = "¡La Pregunta fue actualizada correctamente!"
                     except Exception as e:
-                        # Registrar el error en el historial
                         registrar_error(request, 'mantenedor_preguntas', f"Error al actualizar pregunta: {str(e)}")
                         data["mesg"] = "¡No se pudo actualizar la pregunta!"
             else:
@@ -205,7 +220,6 @@ def mantenedor_preguntas(request, action, id):
                 data["mesg"] = "¡La Pregunta fue eliminada correctamente!"
                 return redirect('mantenedor_preguntas', action='ins', id='-1')
             except Exception as e:
-                # Registrar el error en el historial
                 registrar_error(request, 'mantenedor_preguntas', f"Error al eliminar pregunta: {str(e)}")
                 data["mesg"] = "¡No se pudo eliminar la pregunta!"
 
@@ -213,7 +227,6 @@ def mantenedor_preguntas(request, action, id):
         data["form"] = form
 
     except Exception as e:
-        # Registrar el error en el historial
         registrar_error(request, 'mantenedor_preguntas', f"Error en mantenedor de preguntas: {str(e)}")
         messages.error(request, 'Ha ocurrido un error al procesar la solicitud.')
 
@@ -270,34 +283,134 @@ def validar_licitacion(request):
     return render(request, 'core/validar_licitacion.html', {'form': form})
 
 
-
 ## SUBIR ARCHIVO LICITACION ###
 @login_required
 def subir_archivo_lici(request, id):
-    id_licitacion = id
-    
-    if not id_licitacion:
-        messages.error(request, 'Por favor, proporcione un ID de Licitación válido.')
-        return redirect('validar_licitacion')
-
-    licitacion = Licitacion.objects.filter(idLicitacion=id_licitacion).first()
+    licitacion = get_object_or_404(Licitacion, idLicitacion=id)
 
     if request.method == 'POST':
         form = SubirArchivoForm(request.POST, request.FILES, instance=licitacion)
 
         if form.is_valid():
-            licitacion = form.save(commit=False)
-            licitacion.subido_por = request.user 
-            licitacion.save()
-            
-            messages.success(request, '¡Archivo de licitación guardado correctamente!')
-            return redirect('validar_licitacion')
+            archivo = form.cleaned_data.get('archivoLicitacion')
+            if archivo:
+                if not archivo.name.endswith('.pdf'):
+                    messages.error(request, 'Solo se permiten archivos PDF.')
+                else:
+                    file_name = default_storage.save(archivo.name, ContentFile(archivo.read()))
+                    file_path = default_storage.path(file_name)
+
+                    source_id = subir_chatpdf(file_path)
+                    if source_id:
+                        try:
+                            id_pregunta = Preguntasbbdd.objects.get(nombrePregunta="ID de la licitación").nombrePregunta
+                            respuesta_id = preguntar_chatpdf(source_id, id_pregunta)
+
+                            if respuesta_id and str(licitacion.idLicitacion) in respuesta_id:
+                                licitacion.archivoLicitacion = file_name
+                                licitacion.save()
+                                messages.success(request, 'Archivo validado correctamente por ID de licitación.')
+                                request.session['file_name'] = file_name
+                                return redirect('seleccionar_preguntas', licitacion_id=licitacion.idLicitacion)
+                            else:
+                                messages.error(request, 'El archivo no pertenece a la licitación. Ningún parámetro coincide.')
+                        except Preguntasbbdd.DoesNotExist as e:
+                            messages.error(request, f'No se encontró la pregunta necesaria en la base de datos: {str(e)}')
+                    else:
+                        messages.error(request, 'Error al subir el archivo PDF o no se validó correctamente.')
+
+            else:
+                messages.error(request, 'No se ha seleccionado ningún archivo para subir.')
         else:
-            messages.error(request, 'Error al guardar el archivo de licitación. Asegúrese de que el archivo sea un PDF.')
+            messages.error(request, 'Error en el formulario.')
     else:
         form = SubirArchivoForm(instance=licitacion)
 
-    return render(request, 'core/subir_archivo_lici.html', {'form': form, 'id_licitacion': id_licitacion})
+    return render(request, 'core/subir_archivo_lici.html', {'form': form, 'id_licitacion': id})
+
+
+@login_required
+def seleccionar_preguntas(request, licitacion_id):
+    licitacion = get_object_or_404(Licitacion, idLicitacion=licitacion_id)
+    preguntas = Preguntasbbdd.objects.all()
+
+    if request.method == 'POST':
+        preguntas_seleccionadas = request.POST.getlist('preguntas')
+        if preguntas_seleccionadas:
+            for pregunta_id in preguntas_seleccionadas:
+                pregunta = get_object_or_404(Preguntasbbdd, idPreguntas=pregunta_id)
+                
+                if licitacion.archivoLicitacion and licitacion.archivoLicitacion.path:
+                    try:
+                        respuesta_texto = preguntar_chatpdf(licitacion.archivoLicitacion.path, pregunta.nombrePregunta)
+                        if respuesta_texto is not None:
+                            respuesta = Respuesta.objects.create(
+                                licitacion=licitacion,
+                                pregunta=pregunta,
+                                textoRespuesta=respuesta_texto
+                            )
+                        else:
+                            messages.error(request, f'No se pudo obtener respuesta para la pregunta "{pregunta.nombrePregunta}"')
+                    except Exception as e:
+                        messages.error(request, f'Error al hacer la pregunta: {str(e)}')
+                else:
+                    messages.error(request, 'La licitación no tiene un archivo asociado.')
+            
+            return redirect('leer_pdf', id=licitacion_id)
+        else:
+            messages.error(request, 'Debe seleccionar al menos una pregunta.')
+
+    return render(request, 'core/filtro_pregun.html', {'preguntas': preguntas, 'licitacion': licitacion})
+
+@login_required
+def leer_pdf(request, id):
+    licitacion = get_object_or_404(Licitacion, idLicitacion=id)
+    preguntas_seleccionadas = request.session.get('preguntas_seleccionadas', [])
+
+    preguntas_respuestas = []
+    for pregunta_id in preguntas_seleccionadas:
+        pregunta = get_object_or_404(Preguntasbbdd, idPreguntas=pregunta_id)
+        respuesta = Respuesta.objects.filter(licitacion=licitacion, pregunta=pregunta).first()
+        respuesta_texto = respuesta.textoRespuesta if respuesta else 'No hay respuesta'
+
+        preguntas_respuestas.append({
+            'pregunta': pregunta,
+            'respuesta': respuesta_texto
+        })
+
+    return render(request, 'core/leer_pdf.html', {
+        'licitacion': licitacion,
+        'preguntas_respuestas': preguntas_respuestas,
+    })
+
+
+@login_required
+def guardar_respuestas(request, id):
+    if request.method == 'POST':
+        licitacion = get_object_or_404(Licitacion, idLicitacion=id)
+        preguntas_seleccionadas = request.session.get('preguntas_seleccionadas', [])
+
+        for pregunta_id in preguntas_seleccionadas:
+            pregunta = get_object_or_404(Preguntasbbdd, idPreguntas=pregunta_id)
+            
+            if licitacion.archivoLicitacion and licitacion.archivoLicitacion.path:
+                respuesta_texto = preguntar_chatpdf(licitacion.archivoLicitacion.path, pregunta.nombrePregunta)
+                if respuesta_texto is not None:
+                    respuesta, created = Respuesta.objects.get_or_create(
+                        licitacion=licitacion,
+                        pregunta=pregunta,
+                        defaults={'textoRespuesta': respuesta_texto}
+                    )
+                    if created:
+                        messages.success(request, f'Respuesta para la pregunta "{pregunta.nombrePregunta}" guardada correctamente.')
+                else:
+                    messages.error(request, f'No se pudo obtener respuesta para la pregunta "{pregunta.nombrePregunta}".')
+            else:
+                messages.error(request, 'La licitación no tiene un archivo asociado.')
+        del request.session['preguntas_seleccionadas']
+
+    return redirect('leer_pdf', id=id)
+
 
 
 # HISTORIAL LICITACIONES ##################################
@@ -307,136 +420,23 @@ def historial_lici(request):
     return render(request, 'core/historial_lici.html', {'licitaciones': licitaciones})
 
 
-
-
-
-
-
-
-
-
-##########################################################################################
-"""
-
-# SUBIR ARCHIVO DE LICITACIONES #
+### VER TODA LA INFORMACION DE LA LICITACION + RESPUESTAS CHATPDF
 @login_required
-def subir_archivo(request):
-    licitacion_id = request.GET.get('id', None)
-    licitacion = None
-    id_encontrado = None
-    error = None
-    pregunta_id = 1  
-
-    if licitacion_id:
-        licitacion = get_object_or_404(Licitacion, idLicitacion=licitacion_id)
-
-    if request.method == 'POST' and 'validar' in request.POST:
-        form = SubirArchivoForm(request.POST, request.FILES, instance=licitacion if licitacion else None)
-        if form.is_valid():
-            archivo = form.cleaned_data.get('archivoLicitacion')
-            if archivo:
-                # Verificar que el archivo sea PDF
-                if not archivo.name.endswith('.pdf'):
-                    error = 'Solo se permiten archivos PDF.'
-                else:
-                    file_name = default_storage.save(archivo.name, ContentFile(archivo.read()))
-                    file_path = default_storage.path(file_name)
-
-                    source_id = subir_chatpdf(file_path)
-                    if source_id:
-                        pregunta = Preguntasbbdd.objects.get(idPreguntas=pregunta_id).nombrePregunta
-                        respuesta_api = preguntar_chatpdf(source_id, pregunta, id_only=True)
-                        if respuesta_api:
-                            id_encontrado = respuesta_api.strip().split()[-1]  # Extraer solo el ID
-                            if id_encontrado == str(licitacion.idLicitacion):
-                                # Guardar la respuesta en la base de datos
-                                pregunta_obj = Preguntasbbdd.objects.get(idPreguntas=pregunta_id)
-                                Respuesta.objects.create(
-                                    licitacion=licitacion,
-                                    pregunta=pregunta_obj,
-                                    textoRespuesta=id_encontrado
-                                )
-                                messages.success(request, 'Archivo validado correctamente. Ahora puede guardarlo.')
-                                # Guardar el nombre del archivo en la sesión
-                                request.session['file_name'] = file_name
-
-                                # Redirigir a la seleccion preguntas
-                                return redirect('seleccionar_preguntas', licitacion_id=licitacion.idLicitacion)
-                            else:
-                                error = 'El ID de la licitación en el archivo no coincide con el ID de la licitación seleccionada.'
-                        else:
-                            error = 'No se pudo obtener una respuesta de la API.'
-                    else:
-                        error = 'Error al subir el archivo PDF.'
-            else:
-                error = 'No se ha seleccionado ningún archivo para subir.'
-        else:
-            error = 'Error en el formulario.'
-
-    if request.method == 'POST' and 'guardar' in request.POST:
-        form = SubirArchivoForm(request.POST, instance=licitacion if licitacion else None)
-        if form.is_valid():
-            file_name = request.session.get('file_name')
-            if file_name:
-                file_path = default_storage.path(file_name)
-                with open(file_path, 'rb') as f:
-                    archivo = ContentFile(f.read(), name=file_name)
-                if licitacion:
-                    licitacion.archivoLicitacion = archivo
-                    licitacion.save(update_fields=['archivoLicitacion'])
-                    messages.success(request, '¡El archivo ha sido guardado con éxito!')
-                    # Eliminar el nombre del archivo de la sesión
-                    del request.session['file_name']
-                    return redirect('subir_archivo')
-                else:
-                    messages.warning(request, 'No se ha seleccionado ninguna licitación.')
-            else:
-                messages.warning(request, 'No se ha seleccionado ningún archivo para subir o la validación no ha sido exitosa.')
-        else:
-            error = 'Error en el formulario.'
-    else:
-        form = SubirArchivoForm(instance=licitacion if licitacion else None)
-
-    return render(request, 'core/subir_archivo.html', {'form': form, 'licitacion': licitacion, 'id_encontrado': id_encontrado, 'error': error}) """
-
-
-
-#######################################################################################
-# LEER ARCHIVOS PDF CON SUS RESPECTIVAS RESPUESTAS ###################
-def leer_pdf(request, id):
+def ver_info_licitacion(request, id):
     licitacion = get_object_or_404(Licitacion, idLicitacion=id)
-    preguntas = Preguntasbbdd.objects.all()
     respuestas = Respuesta.objects.filter(licitacion=licitacion).select_related('pregunta')
 
-    respuestas_dict = {respuesta.pregunta.idPreguntas: respuesta.textoRespuesta for respuesta in respuestas}
-
     preguntas_respuestas = []
-    for pregunta in preguntas:
+    for respuesta in respuestas:
         preguntas_respuestas.append({
-            'pregunta': pregunta,
-            'respuesta': respuestas_dict.get(pregunta.idPreguntas, 'No hay respuesta')
+            'pregunta': respuesta.pregunta.nombrePregunta,
+            'respuesta': respuesta.textoRespuesta,
         })
 
-    return render(request, 'core/leer_pdf.html', {
+    return render(request, 'core/ver_info_licitacion.html', {
         'licitacion': licitacion,
         'preguntas_respuestas': preguntas_respuestas,
     })
-
-## SELECCION DE PREGUNTAS QUE SE LE HARAN AL ARCHIVO ###################
-@login_required
-def seleccionar_preguntas(request, licitacion_id):
-    licitacion = get_object_or_404(Licitacion, idLicitacion=licitacion_id)
-    preguntas = Preguntasbbdd.objects.all()
-
-    if request.method == 'POST':
-        preguntas_seleccionadas = request.POST.getlist('preguntas')
-        if preguntas_seleccionadas:
-            request.session['preguntas_seleccionadas'] = preguntas_seleccionadas
-            return redirect('leer_pdf', id=licitacion_id)
-        else:
-            messages.error(request, 'Debe seleccionar al menos una pregunta.')
-
-    return render(request, 'core/filtro_pregun.html', {'preguntas': preguntas, 'licitacion': licitacion})
 
 
 #############################################################################

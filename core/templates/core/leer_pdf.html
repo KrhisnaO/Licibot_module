@@ -1,8 +1,12 @@
 {% extends 'core/administrador.html' %}
 
 {% block admin_content %}
-<h3>Resultados para Licitación {{ licitacion.idLicitacion }}</h3>
-
+<h3>Resultados de la Licitación {{ licitacion.idLicitacion }}</h3>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -16,7 +20,18 @@
             <td>{{ item.pregunta.nombrePregunta }}</td>
             <td>{{ item.respuesta }}</td>
         </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2">No hay preguntas registradas para esta licitación.</td>
+        </tr>
         {% endfor %}
     </tbody>
 </table>
+
+{% if preguntas_respuestas %}
+    <form action="{% url 'guardar_respuestas' licitacion.idLicitacion %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Guardar respuestas</button>
+    </form>
+{% endif %}
 {% endblock %}
