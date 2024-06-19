@@ -156,16 +156,6 @@ def cerrar_sesion(request):
 def administrador(request):
     return render(request, 'core/administrador.html')
 
-# LOGIN VENDEDOR ####################################################################
-@login_required
-def vendedor(request):
-    return render(request, 'core/vendedor.html')
-
-# LOGIN GERENTE ####################################################################
-@login_required
-def gerente(request):
-    return render(request, 'core/gerente.html')
-
 # VISTA DE GERENTE HISTORIAL CON USUARIOS ############################################
 @login_required
 def historial_lici_con_usuario(request):
