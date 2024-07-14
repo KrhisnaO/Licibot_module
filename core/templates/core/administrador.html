@@ -13,13 +13,14 @@
 <br>
 <br>
 <div class="container">
-    <div class="row ">
-        <div class="col-md-3 ">
-            <div class="list-group ">
-                <a href="{% url 'crear_usuario' %}" class="fa fa-user list-group-item list-group-item-action menu-item "> 
+    <div class="row">
+        <div class="col-md-3">
+            <div class="list-group">
+
+                {% if is_superuser %}
+                <a href="{% url 'crear_usuario' %}" class="fa fa-user list-group-item list-group-item-action menu-item"> 
                     <span>Crear Usuario</span>
                 </a>
-
                 <a href="{% url 'historial_usu' %}" class="fa fa-clock-o list-group-item list-group-item-action menu-item">
                     <span class="menu-link ist-group-item-action">Historial de Usuarios</span>
                 </a>
@@ -38,12 +39,41 @@
                 <a href="{% url 'mantenedor_preguntas' action='ins' id=-1 %}" class="fa fa-question-circle list-group-item list-group-item-action menu-item">
                     <span class="menu-link">Mantenedor de preguntas</span>
                 </a>
-                <a href="{% url 'historial_errores' %}" class="fa fa-exclamation-circle list-group-item list-group-item-action menu-item" >
+                
+
+                <a href="{% url 'historial_errores' %}" class="fa fa-exclamation-circle list-group-item list-group-item-action menu-item">
                     <span class="menu-link">Historial de Errores</span>
                 </a>
+                {% endif %}
+
+                {% if 'VENDEDOR' in user_groups %}
+                <div class="list-group-item list-group-item-action menu-item" id="submenu-licitaciones">
+                    <span class="fa fa-gavel"> Mantenedor de Licitaciones</span>
+                    <div class="submenu">
+                        <a href="{% url 'validar_licitacion' %}" class="submenu-item">Buscar </a>
+                        <a href="{% url 'historial_lici' %}" class="submenu-item">Historial</a>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if 'GERENTE' in user_groups  %}
+                
+                <div class="list-group-item list-group-item-action menu-item" id="submenu-licitaciones">
+                    <span class="fa fa-gavel"> Mantenedor de Licitaciones</span>
+                    <div class="submenu">
+                        <a href="{% url 'validar_licitacion' %}" class="submenu-item">Buscar </a>
+                        <a href="{% url 'historial_lici' %}" class="submenu-item">Historial</a>
+                    </div>
+                </div>
+
+                <a href="{% url 'historial_lici_con_usuario' %}" class="fa fa-list list-group-item list-group-item-action menu-item">
+                    <span class="menu-link ist-group-item-action">Historial de Licitaciones con Usuario</span>
+                </a>
+                {% endif %}
+
             </div>
         </div>
-        <div class="col-md-9" >
+        <div class="col-md-9">
             {% block admin_content %}
             {% endblock %}
         </div>

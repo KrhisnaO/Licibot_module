@@ -171,7 +171,13 @@ def cerrar_sesion(request):
 # LOGIN ADMINISTRADR ################################################################
 @login_required
 def administrador(request):
-    return render(request, 'core/administrador.html')
+    user_groups = request.user.groups.values_list('name', flat=True)
+    is_superuser = request.user.is_superuser
+    context = {
+        'user_groups': user_groups,
+        'is_superuser': is_superuser,
+    }
+    return render(request, 'core/administrador.html', context)
 
 # VISTA DE GERENTE HISTORIAL CON USUARIOS ############################################
 @login_required
