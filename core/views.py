@@ -58,11 +58,11 @@ def login_view(request):
                 if user.is_active:
                     login(request, user)
                     if user.is_superuser:
-                        return redirect('administrador')
+                        return redirect('home')
                     elif user.groups.filter(name='VENDEDOR').exists():
-                        return redirect('administrador')
+                        return redirect('home')
                     elif user.groups.filter(name='GERENTE').exists():
-                        return redirect('administrador')
+                        return redirect('home')
                     else:
                         return redirect('home')
                 else:
