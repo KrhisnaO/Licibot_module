@@ -9,7 +9,7 @@ def obtener_licitaciones(filtro_id=None):
     Obtiene licitaciones desde la API de Mercado Público.
     :return: Lista de diccionarios con info de las licitaciones, o None si hay un error en la solicitud.
     """
-    ticket = "F8537A18-6766-4DEF-9E59-426B4FEE2844" ##TICKET API MERCADO PUBLICO
+    ticket = "E9C79D57-5B5F-42DC-B118-C8172CA3E31E" ##TICKET API MERCADO PUBLICO
     base_url = "https://api.mercadopublico.cl/servicios/v1/Publico/Licitaciones.json?"
 
     if filtro_id:
@@ -86,7 +86,7 @@ def preguntar_chatpdf(source_id, pregunta, id_only=False):
 
     content = pregunta
     if id_only:
-        content = f"{pregunta} Por favor, responde solo con el ID de la licitación sin texto adicional."
+        content = f"{pregunta} Por favor, responde solo con el ID de la licitación sin texto adicional, cabe mencionar que hay casos en que el ID se menciona como Número de Adquisición."
 
     question_data = {
         "sourceId": source_id,

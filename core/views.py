@@ -3,19 +3,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from .models import CustomUser, Licitacion, Preguntasbbdd, Respuesta, ErrorHistory
-from .forms import LoginForm, CreateUserForm, LicitacionForm, PreguntasForm, SubirArchivoForm, CustomPasswordResetForm, ValidarIDLicitacionForm
+from .forms import LoginForm, CreateUserForm, PreguntasForm, SubirArchivoForm, CustomPasswordResetForm, ValidarIDLicitacionForm
 import requests
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 
+import datetime
+
+
 ## MANEJO DE APIS ##
 from .utils import obtener_licitaciones, subir_chatpdf, preguntar_chatpdf
-
-## MANEJO DE ERRORES EN EL SISTEMA ##
-from .middleware import ErrorLoggingMiddleware
-from datetime import datetime
-import traceback
 
 ## EXCEL ##
 from django.http import HttpResponse
@@ -28,8 +26,12 @@ from openpyxl.chart.label import DataLabelList
 def home(request):
     lici_count = Licitacion.objects.count()
     preg_count = Preguntasbbdd.objects.count()
-    nolici_count = Licitacion.objects.filter(Q(archivoLicitacion__isnull=True) | Q(archivoLicitacion="")).count()
+    nolici_count = Licitacion.objects.filter(archivoLicitacion__isnull=True).count() + Licitacion.objects.filter(archivoLicitacion="").count()
     licidoc_count = Licitacion.objects.filter(~Q(archivoLicitacion__isnull=True) & ~Q(archivoLicitacion="")).count()
+    fecha_actual = datetime.date.today().strftime("%d de %m de %Y")
+
+    ultimas_licitaciones = Licitacion.objects.order_by('-fecha_creacion')[:5]
+    tamano_total_megabytes = calcular_tamano_total_pdf() / (1024 * 1024)
 
     # Verifica la pertenencia a grupos
     is_vendedor = request.user.groups.filter(name='VENDEDOR').exists()
@@ -40,11 +42,20 @@ def home(request):
         'preg_count': preg_count,
         'nolici_count': nolici_count,
         'licidoc_count': licidoc_count,
+        'fecha_actual': fecha_actual,
+        'ultimas_licitaciones': ultimas_licitaciones,
+        'tamano_total_megabytes': round(tamano_total_megabytes, 1),
         'is_vendedor': is_vendedor,
         'is_gerente': is_gerente,
     }
 
     return render(request, 'core/home.html', context)
+
+## CALCULA TAMAÑO DE LOS ARCHIVOS PDF GUARDADOS ##
+def calcular_tamano_total_pdf():
+    licitaciones_con_archivos = Licitacion.objects.exclude(archivoLicitacion='')
+    tamano_total_bytes = sum(licitacion.archivoLicitacion.size for licitacion in licitaciones_con_archivos)
+    return tamano_total_bytes
 
 ##### INGRESO DE SESION ###################################################
 def login_view(request):

@@ -2,41 +2,29 @@
 {% load static %}
 
 {% block stylesheet %}
-<link href="{% static 'core/css/forms.css' %}" rel="stylesheet">
+<link href="{% static 'core/css/login.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div id="fondocollog" class="card">
-                <div id="ingresocard" class="card-header">
-                    <h3 id="colblanc" class="text-center">Iniciar Sesión</h3>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="" enctype="multipart/form-data" id="formulario">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label id="colblanc" for="id_username">Correo:</label>
-                            {{ form.username }}
-                        </div>
-                        <div class="form-group">
-                            <label id="colblanc" for="id_password">Contraseña:</label>
-                            {{ form.password }}
-                        </div>
-                        <div class="text-center">
-                            <input type="submit" class="btn btn-danger" value="Ingresar">
-                        </div>
-                        <div class="text-center">
-                            <a href="{% url 'recuperar_pass' %}" class="btn btn-link">Recuperar Contraseña</a>
-                        </div>
-                        {% if mesg %}
-                        <div id="form_message" class="alert alert-danger mt-3" role="alert">{{ mesg }}</div>
-                        {% endif %}
-                    </form>
-                </div>
-            </div>
-        </div>
+<div class="login-container">
+    <div class="login">
+        <form method="POST" action="">
+          {% csrf_token %}
+          <p class="form-login">Iniciar Sesión</p>
+          <div class="input-box">
+            <input required placeholder="Correo" type="text" name="username" />
+          </div>
+          <div class="input-box">
+            <input required placeholder="Contraseña" type="password" name="password" />
+          </div>
+          <div class="remember-forgot">
+            <a href="{% url 'recuperar_pass' %}">¿Has olvidado la contraseña?</a>
+          </div>
+          <button class="btn" type="submit">Ingresar</button>
+        </form>
+        {% if mesg %}
+        <div id="form_message" class="alert alert-danger mt-3" role="alert">{{ mesg }}</div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

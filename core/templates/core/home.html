@@ -1,74 +1,111 @@
-<!--AQUI SOLO UTILIZAREMOS DEL HOME/CONTENIDO COMO LAS ESTADISTICAS ETC-->
 {% extends 'core/base.html' %}
 {% load static %}
 
 {% block stylesheet %}
+<link rel="stylesheet" href="{% static 'core/css/card.css' %}">
 <link rel="stylesheet" href="{% static 'core/css/general.css' %}">
-<link rel="stylesheet" href="{% static 'core/css/textomovil.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-3">
     <div class="row">
         <div class="col-md-8 offset-md-2">
-            <div class="info-box">
-                <h2 class="text-center">Información de Licibot</h2>
-                <p>Licibot es una plataforma diseñada para simplificar la gestión de licitaciones públicas y privadas. Con Licibot, puedes:</p>
-                <ul>
-                    <li>Analizar y resumir automáticamente la documentación de licitaciones.</li>
-                    <li>Interactuar con la plataforma de manera intuitiva para consultar licitaciones.</li>
-                    <li>Facilitar la identificación de licitaciones basadas en criterios específicos.</li>
-                    <li>version 0.75</li>
-                </ul>
+            <div class="card mb-1">
+                <div class="card-body">
+                    <h2 id="coltit" class="text-center">Bienvenid@ a Licibot</h2>
+                    <p class="card-text">Optimiza la lectura de archivos de licitaciones con nuestra solución basada en IA. Minimiza el tiempo de análisis diario y maximiza la eficiencia.</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
-<div class="container mt-5">
+
+<!-- Contenido principal -->
+<div class="container">
+    <!-- Row para contener las cards de tamaño de archivos, palabras leídas y páginas leídas -->
+    <div class="row mt-2">
+        <div class="col-md-4">
+            <div class="card mb-1">
+                <div class="card-body">
+                    <h5 class="text-center" style="font-weight: bold;">
+                        Tamaño total de archivos PDF
+                    </h5>
+                    <p class="card-text">{{ tamano_total_megabytes }} MB</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-1">
+                <div class="card-body">
+                    <h5 class="text-center" style="font-weight: bold;">
+                        Palabras leídas
+                    </h5>
+                    <p class="card-text">{{ tamano_total_megabytes }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-1">
+                <div class="card-body">
+                    <h5 class="text-center" style="font-weight: bold;">
+                        Páginas leídas
+                    </h5>
+                    <p class="card-text">{{ tamano_total_megabytes }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row para contener las últimas licitaciones y el gráfico -->
+    <div class="row mt-3">
+        <!-- Card con las últimas 5 licitaciones -->
+        <div class="col-md-6">
+            <div class="card mb-1">
+                <div class="card-body">
+                    <h5 class="text-center" style="font-weight: bold;">
+                        Últimas 5 Licitaciones agregadas
+                    </h5>
+                    <ul class="list-group list-group-flush">
+                        {% for licitacion in ultimas_licitaciones %}
+                        <li class="list-group-item">
+                            <strong>ID:</strong> {{ licitacion.idLicitacion }}<br>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card con el Pie Chart -->
+        <div class="col-md-6">
+            <div class="card mb-1">
+                <div class="card-body">
+                    <h5 class="text-center" style="font-weight: bold;">
+                        Distribución de Licitaciones con y sin Archivo
+                    </h5>
+                    <canvas id="myChart" style="width:100%;max-width:500px"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fecha -->
     <div class="row">
         <div class="col-md-8 offset-md-2">
+            <p class="text-center" style="font-weight: bold;">
+                Datos actualizados hasta: {{ fecha_actual }}
+            </p>
         </div>
     </div>
 </div>
-<div class="marquee-container">
-    <div class="marquee" id="marquee">
-        <ul class="licitaciones-container">
-            <span id="colormor">
-                | Hay {{ lici_count }} licitaciones guardadas |
-            </span>
-            <span id="colormor">
-                |Licitaciones sin Archivo: {{ nolici_count }} |
-            </span>
-            <span id="colormor">
-                |Licitaciones con Archivo: {{ licidoc_count }} |
-            </span>
-        </ul>
-    </div>
-</div>
 
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const marquee = document.getElementById('marquee');
-        const containerWidth = document.querySelector('.marquee-container').offsetWidth;
-        const marqueeWidth = marquee.offsetWidth;
-        let currentPos = containerWidth;
-
-        function animateMarquee() {
-            currentPos -= 2; // Velocidad del desplazamiento
-            if (currentPos < -marqueeWidth) {
-                currentPos = containerWidth;
-            }
-            marquee.style.transform = `translateX(${currentPos}px)`;
-            requestAnimationFrame(animateMarquee);
-        }
-        animateMarquee();
-    });
+    // Pasar valores de Django a JavaScript
+    const liciCount = {{ lici_count }};
+    const noliciCount = {{ nolici_count }};
+    const licidocCount = {{ licidoc_count }};
 </script>
-
-
+<script src="{% static 'core/js/chart-config.js' %}"></script>
 {% endblock %}
-
-
-
-
-

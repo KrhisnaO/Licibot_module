@@ -1,0 +1,65 @@
+.button-lici {
+    display: flex;
+    border: 1px solid #aea0f5; 
+  }
+  
+  .box-ti {
+    width: 35px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    transition: all .8s;
+    cursor: pointer;
+    position: relative;
+    background:  #e02030;
+    overflow: hidden;
+  }
+  
+  .box-ti:before {
+    content: "M";
+    position: absolute;
+    top: 0;
+    background: #6656b5;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(100%);
+    transition: transform .4s;
+  }
+  
+  .box-ti:nth-child(2)::before {
+    transform: translateY(-100%);
+    content: 'O';
+  }
+  
+  .box-ti:nth-child(3)::before {
+    content: 'D';
+  }
+  
+  .box-ti:nth-child(4)::before {
+    transform: translateY(-100%);
+    content: 'U';
+  }
+  
+  .box-ti:nth-child(5)::before {
+    content: 'L';
+  }
+
+  .box-ti:nth-child(6)::before {
+    transform: translateY(-100%);
+    content: 'E';
+  }
+
+  .box-ti:nth-child(7)::before {
+    content: '';
+  }
+  
+  .button-lici:hover .box-ti:before {
+    transform: translateY(0);
+  }
