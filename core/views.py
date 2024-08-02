@@ -356,12 +356,12 @@ def seleccionar_preguntas(request, licitacion_id):
         if preguntas_seleccionadas:
             for pregunta_id in preguntas_seleccionadas:
                 pregunta = get_object_or_404(Preguntasbbdd, idPreguntas=pregunta_id)
-                
                 if licitacion.archivoLicitacion and licitacion.archivoLicitacion.path:
                     try:
                         respuesta_texto = preguntar_chatpdf(licitacion.archivoLicitacion.path, pregunta.nombrePregunta)
+                        
                         if respuesta_texto is not None:
-                            respuesta = Respuesta.objects.create(
+                            Respuesta.objects.create(
                                 licitacion=licitacion,
                                 pregunta=pregunta,
                                 textoRespuesta=respuesta_texto
@@ -383,7 +383,7 @@ def seleccionar_preguntas(request, licitacion_id):
 def leer_pdf(request, id):
     licitacion = get_object_or_404(Licitacion, idLicitacion=id)
     preguntas_seleccionadas = request.session.get('preguntas_seleccionadas', [])
-
+    print(preguntas_seleccionadas)
     preguntas_respuestas = []
     for pregunta_id in preguntas_seleccionadas:
         pregunta = get_object_or_404(Preguntasbbdd, idPreguntas=pregunta_id)
@@ -413,7 +413,7 @@ def guardar_respuestas(request, id):
             if licitacion.archivoLicitacion and licitacion.archivoLicitacion.path:
                 respuesta_texto = preguntar_chatpdf(licitacion.archivoLicitacion.path, pregunta.nombrePregunta)
                 if respuesta_texto is not None:
-                    respuesta, created = Respuesta.objects.get_or_create(
+                    created = Respuesta.objects.get_or_create(
                         licitacion=licitacion,
                         pregunta=pregunta,
                         defaults={'textoRespuesta': respuesta_texto}

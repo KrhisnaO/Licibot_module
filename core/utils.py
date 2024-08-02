@@ -81,35 +81,42 @@ def subir_chatpdf(file_path):
         return None
 
 def preguntar_chatpdf(source_id, pregunta, id_only=False):
-    api_key = 'sec_tK5rAXVkeTNOhFjQUfJNeLq0rMlyFkjy'
+    result= subir_chatpdf(source_id)
+    api_key = 'sec_tK5rAXVkeTNOhFjQUfJNeLq0rMlyFkjy'  # Reemplaza con tu clave API real
     url = 'https://api.chatpdf.com/v1/chats/message'
-
+    
+    # Modificar contenido de la pregunta si es necesario
     content = pregunta
     if id_only:
         content = f"{pregunta} Por favor, responde solo con el ID de la licitación sin texto adicional, cabe mencionar que hay casos en que el ID se menciona como Número de Adquisición."
 
+    # Datos para la solicitud
     question_data = {
-        "sourceId": source_id,
+        "sourceId": result,
         "messages": [
             {"role": "user", "content": content}
         ]
     }
 
     try:
+        # Encabezados de la solicitud
         headers = {
             'x-api-key': api_key,
             'Content-Type': 'application/json'
         }
+        
+        # Realizar la solicitud POST
         response = requests.post(url, headers=headers, json=question_data)
-        response.raise_for_status()
-
+        response.raise_for_status()  # Lanzar una excepción para códigos de estado 4xx/5xx
+        print(response.json())
+        
+        # Manejo de la respuesta
         data = response.json()
         if isinstance(data, dict) and 'content' in data:
-            return data['content']
+            return data.content
         else:
             registrar_error('preguntar_chatpdf', f"Respuesta inesperada de la API: {data}")
             return None
-
     except requests.exceptions.RequestException as e:
         registrar_error('preguntar_chatpdf', str(e))
         return None
@@ -119,7 +126,6 @@ def preguntar_chatpdf(source_id, pregunta, id_only=False):
     except Exception as e:
         registrar_error('preguntar_chatpdf', str(e))
         return None
-
 
 def registrar_error(tipo_vista, descripcion):
     try:
